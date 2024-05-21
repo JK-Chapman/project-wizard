@@ -1,7 +1,12 @@
-[gd_scene load_steps=21 format=3 uid="uid://cwtj7274tsgs"]
+[gd_scene load_steps=25 format=3 uid="uid://cwtj7274tsgs"]
 
 [ext_resource type="Texture2D" uid="uid://c2qaxypd3n6ym" path="res://Assets/AnimationSheets/JesterMoveset.png" id="1_h08ra"]
 [ext_resource type="Script" path="res://GameObjects/Player/Player.gd" id="1_wpc8h"]
+[ext_resource type="Texture2D" uid="uid://dgiiwke3ov8js" path="res://Assets/Placeholder/buzzsaw.png" id="3_sb3n3"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_fb4g0"]
+radius = 6.0
+height = 20.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_520dx"]
 atlas = ExtResource("1_h08ra")
@@ -138,20 +143,47 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_fb4g0"]
-radius = 6.0
-height = 20.0
+[sub_resource type="AtlasTexture" id="AtlasTexture_6ixed"]
+atlas = ExtResource("3_sb3n3")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_8ynh3"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6ixed")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_72f4g"]
+radius = 15.0
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_wpc8h")
 
-[node name="PlayerSprite" type="AnimatedSprite2D" parent="."]
-texture_filter = 1
-sprite_frames = SubResource("SpriteFrames_4bd7b")
-animation = &"walk_left"
-frame_progress = 0.0297783
-speed_scale = 2.0
-
 [node name="PlayerHitbox" type="CollisionShape2D" parent="."]
 position = Vector2(-1, 1)
 shape = SubResource("CapsuleShape2D_fb4g0")
+
+[node name="PlayerSprite" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_4bd7b")
+animation = &"walk_right"
+speed_scale = 2.0
+
+[node name="PlayerSpellPoint" type="Node2D" parent="."]
+position = Vector2(-1, 1)
+
+[node name="SpellPointSprite" type="AnimatedSprite2D" parent="PlayerSpellPoint"]
+texture_filter = 1
+position = Vector2(23, -1)
+sprite_frames = SubResource("SpriteFrames_8ynh3")
+
+[node name="Area2D" type="Area2D" parent="PlayerSpellPoint/SpellPointSprite"]
+position = Vector2(0, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerSpellPoint/SpellPointSprite/Area2D"]
+shape = SubResource("CircleShape2D_72f4g")
