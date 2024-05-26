@@ -1,13 +1,25 @@
-[gd_scene load_steps=2 format=3 uid="uid://bkfqordlhofmh"]
+[gd_scene load_steps=4 format=3 uid="uid://bkfqordlhofmh"]
 
+[ext_resource type="Script" path="res://GameObjects/Enemies/TrackingMissile.gd" id="1_42ck3"]
 [ext_resource type="Texture2D" uid="uid://bd8y3url0aq58" path="res://Assets/Placeholder/missile.png" id="1_m8geq"]
 
-[node name="Missile" type="Area2D"]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ctiyg"]
+radius = 5.0
+height = 32.0
+
+[node name="Missile" type="Area2D" groups=["Projectile"]]
+scale = Vector2(0.7, 0.7)
 collision_layer = 4
 collision_mask = 11
+script = ExtResource("1_42ck3")
 
 [node name="MissileSprite" type="Sprite2D" parent="."]
 texture_filter = 1
 texture = ExtResource("1_m8geq")
 
 [node name="MissileHitbox" type="CollisionShape2D" parent="."]
+position = Vector2(0, 1)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_ctiyg")
+
+[connection signal="body_entered" from="." to="." method="_on_Missile_body_entered"]

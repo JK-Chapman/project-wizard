@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://c2hw12giijv64"]
+
+[ext_resource type="Texture2D" uid="uid://dumjt4epuge1u" path="res://icon.svg" id="1_w4oq8"]
+[ext_resource type="Script" path="res://GameObjects/Enemies/MissileSpawner.gd" id="2_r2881"]
+
+[node name="Spawner" type="Sprite2D"]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_w4oq8")
+script = ExtResource("2_r2881")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 3.0
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

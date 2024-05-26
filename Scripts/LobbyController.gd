@@ -19,76 +19,45 @@ func _ready():
 	randomize()
 	
 func _process(_delta):
-	
 	if (!GameManager.player_dicts.has(0)) && Input.is_action_just_released("start0"):
-		var player_inst = player.instantiate()
-		GameManager.player_dicts[0] = ["#a20303"]
-		player_inst.init(0)
-		player_inst.position.x = (randi() % int(size.x)) - (size.x/2) + centerpos.x
-		player_inst.position.y = (randi() % int(size.y)) - (size.y/2) + centerpos.y
-		camera.add_target(player_inst)
-		get_parent().add_child(player_inst)
+		SpawnPlayer("#a20303", 0)
 	elif GameManager.player_dicts.has(0) && Input.is_action_just_released("back0"):
-		var p = get_parent().get_node("Player0")
-		camera.remove_target(p)
-		p.queue_free()
-		GameManager.player_dicts.erase(0)
+		RemovePlayer(0)
 	
 	if (!GameManager.player_dicts.has(1)) && Input.is_action_just_released("start1"):
-		var player_inst = player.instantiate()
-		GameManager.player_dicts[1] = ["#2f7b00"]
-		player_inst.init(1)
-		player_inst.position.x = (randi() % int(size.x)) - (size.x/2) + centerpos.x
-		player_inst.position.y = (randi() % int(size.y)) - (size.y/2) + centerpos.y
-		camera.add_target(player_inst)
-		get_parent().add_child(player_inst)
+		SpawnPlayer("#2f7b00", 1)
 	elif GameManager.player_dicts.has(1) && Input.is_action_just_released("back1"):
-		var p = get_parent().get_node("Player1")
-		camera.remove_target(p)
-		p.queue_free()
-		GameManager.player_dicts.erase(1)
-		
+		RemovePlayer(1)
+	
 	if (!GameManager.player_dicts.has(2)) && Input.is_action_just_released("start2"):
-		var player_inst = player.instantiate()
-		GameManager.player_dicts[2] = ["#1303a2"]
-		player_inst.init(2)
-		player_inst.position.x = (randi() % int(size.x)) - (size.x/2) + centerpos.x
-		player_inst.position.y = (randi() % int(size.y)) - (size.y/2) + centerpos.y
-		camera.add_target(player_inst)
-		get_parent().add_child(player_inst)
+		SpawnPlayer("#1303a2", 2)
 	elif GameManager.player_dicts.has(2) && Input.is_action_just_released("back2"):
-		var p = get_parent().get_node("Player2")
-		camera.remove_target(p)
-		p.queue_free()
-		GameManager.player_dicts.erase(2)
-		
+		RemovePlayer(2)
+	
 	if (!GameManager.player_dicts.has(3)) && Input.is_action_just_released("start3"):
-		var player_inst = player.instantiate()
-		GameManager.player_dicts[3] = ["#ffffff"]
-		player_inst.position.x = (randi() % int(size.x)) - (size.x/2) + centerpos.x
-		player_inst.position.y = (randi() % int(size.y)) - (size.y/2) + centerpos.y
-		player_inst.init(3)
-		camera.add_target(player_inst)
-		get_parent().add_child(player_inst)
+		SpawnPlayer("#ffffff", 3)
 	elif GameManager.player_dicts.has(3) && Input.is_action_just_released("back3"):
-		var p = get_parent().get_node("Player3")
-		camera.remove_target(p)
-		p.queue_free()
-		GameManager.player_dicts.erase(3)
-		
+		RemovePlayer(3)
+	
 	if (!GameManager.player_dicts.has(4)) && Input.is_action_just_released("start4"):
-		var player_inst = player.instantiate()
-		GameManager.player_dicts[4] = ["#6C1684"]
-		player_inst.position.x = (randi() % int(size.x)) - (size.x/2) + centerpos.x
-		player_inst.position.y = (randi() % int(size.y)) - (size.y/2) + centerpos.y
-		player_inst.init(4)
-		camera.add_target(player_inst)
-		get_parent().add_child(player_inst)
+		SpawnPlayer("#6C1684", 4)
 	elif GameManager.player_dicts.has(4) && Input.is_action_just_released("back4"):
-		var p = get_parent().get_node("Player4")
-		camera.remove_target(p)
-		p.queue_free()
-		GameManager.player_dicts.erase(3)
+		RemovePlayer(4)
+
+func SpawnPlayer(color, index):
+	var player_inst = player.instantiate()
+	GameManager.player_dicts[index] = [color, "Player" + str(index)]
+	player_inst.position.x = (randi() % int(size.x)) - (size.x/2) + centerpos.x
+	player_inst.position.y = (randi() % int(size.y)) - (size.y/2) + centerpos.y
+	player_inst.init(index)
+	camera.add_target(player_inst)
+	add_child(player_inst)
+
+func RemovePlayer(index):
+	var p = get_parent().get_node("Player" + str(index))
+	camera.remove_target(p)
+	p.queue_free()
+	GameManager.player_dicts.erase(index)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

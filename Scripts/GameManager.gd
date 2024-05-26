@@ -9,10 +9,6 @@ extends Node
 # first value in dict references index as well, second value is whether player is instantiated in current level.
 var player_dicts = {}
 
-func reset_player_instanced():
-	for i in player_dicts:
-		player_dicts[i][1] = 0
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass

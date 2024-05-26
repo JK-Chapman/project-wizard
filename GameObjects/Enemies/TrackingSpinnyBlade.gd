@@ -11,7 +11,6 @@ var max_speed = 250
 var acceleration = Vector2()
 var target = null
 var curr_target = null
-var hit_sound_fx = load("res://SoundEffects/flesh_hit.mp3")
 
 
 func start(pos, dir):
@@ -61,7 +60,6 @@ func set_random_target():
 	target = get_parent().get_parent().get_node("Player" + str(curr_target[0]))
 
 func destroy():
-	GameManager.play_sound(hit_sound_fx)
 	queue_free()
 
 func _on_VisibilityNotifier2D_screen_exited():
