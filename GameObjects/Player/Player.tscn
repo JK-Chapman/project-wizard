@@ -1,7 +1,11 @@
-[gd_scene load_steps=21 format=3 uid="uid://cwtj7274tsgs"]
+[gd_scene load_steps=26 format=3 uid="uid://cwtj7274tsgs"]
 
 [ext_resource type="Texture2D" uid="uid://c2qaxypd3n6ym" path="res://Assets/AnimationSheets/JesterMoveset.png" id="1_h08ra"]
 [ext_resource type="Script" path="res://GameObjects/Player/Player.gd" id="1_wpc8h"]
+[ext_resource type="Texture2D" uid="uid://ciipxxf2dnmvh" path="res://Assets/Placeholder/wizardblast.png" id="3_0egyb"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_fb4g0"]
+height = 32.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_520dx"]
 atlas = ExtResource("1_h08ra")
@@ -138,20 +142,162 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_fb4g0"]
-radius = 6.0
-height = 20.0
+[sub_resource type="Animation" id="Animation_mo686"]
+resource_name = "blast"
+length = 0.5
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Area2D/CollisionPolygon2D:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [3, 4, 5, 4, 3, 4]
+}
+
+[sub_resource type="Animation" id="Animation_w8yow"]
+resource_name = "cast"
+length = 0.25
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [0, 1, 2]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Area2D/CollisionPolygon2D:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(),
+"transitions": PackedFloat32Array(),
+"update": 1,
+"values": []
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_n247q"]
+resource_name = "inactive"
+length = 0.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Area2D/CollisionPolygon2D:disabled")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ontu1"]
+_data = {
+"blast": SubResource("Animation_mo686"),
+"cast": SubResource("Animation_w8yow"),
+"inactive": SubResource("Animation_n247q")
+}
 
 [node name="Player" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 3
 script = ExtResource("1_wpc8h")
+
+[node name="PlayerHitbox" type="CollisionShape2D" parent="."]
+position = Vector2(-2, 4)
+shape = SubResource("CapsuleShape2D_fb4g0")
 
 [node name="PlayerSprite" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
+scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_4bd7b")
-animation = &"walk_left"
-frame_progress = 0.0297783
+animation = &"walk_right"
 speed_scale = 2.0
 
-[node name="PlayerHitbox" type="CollisionShape2D" parent="."]
+[node name="PlayerSpellPoint" type="Node2D" parent="."]
 position = Vector2(-1, 1)
-shape = SubResource("CapsuleShape2D_fb4g0")
+
+[node name="SpellPointSprite" type="Sprite2D" parent="PlayerSpellPoint"]
+light_mask = 2
+visibility_layer = 2
+texture_filter = 1
+position = Vector2(45, 1)
+rotation = 1.5708
+scale = Vector2(3.5, 3.5)
+texture = ExtResource("3_0egyb")
+hframes = 6
+
+[node name="Area2D" type="Area2D" parent="PlayerSpellPoint/SpellPointSprite"]
+position = Vector2(-0.333334, -1.66666)
+collision_layer = 8
+collision_mask = 4
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="PlayerSpellPoint/SpellPointSprite/Area2D"]
+polygon = PackedVector2Array(-7.16667, -5.83334, 7.83333, -5.83334, 7.83333, 2.5, 0.333334, 9.16666, -7.16667, 2.5)
+
+[node name="SpellPointAnimPlayer" type="AnimationPlayer" parent="PlayerSpellPoint/SpellPointSprite"]
+libraries = {
+"": SubResource("AnimationLibrary_ontu1")
+}
