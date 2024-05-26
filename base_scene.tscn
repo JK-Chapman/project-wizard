@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://cski23xecm1b4"]
+[gd_scene load_steps=6 format=3 uid="uid://cski23xecm1b4"]
 
 [ext_resource type="Script" path="res://Scripts/LobbyController.gd" id="1_l1dhu"]
 [ext_resource type="PackedScene" uid="uid://cnvf8d7y8w1wt" path="res://Tilemaps/base_tilemap.tscn" id="1_qgelg"]
 [ext_resource type="PackedScene" uid="uid://3toqf2ivdm4i" path="res://GameObjects/Cameras/ZoomCam.tscn" id="3_mx0nm"]
+[ext_resource type="PackedScene" uid="uid://c2hw12giijv64" path="res://GameObjects/Enemies/MissileSpawner.tscn" id="4_hp00e"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xudr5"]
 size = Vector2(536.5, 313)
@@ -21,3 +22,6 @@ max_zoom = 0.3
 [node name="SpawnArea" type="CollisionShape2D" parent="SpawnZone"]
 position = Vector2(403, 189)
 shape = SubResource("RectangleShape2D_xudr5")
+
+[node name="Spawner" parent="." instance=ExtResource("4_hp00e")]
+position = Vector2(52, 68)
