@@ -9,10 +9,10 @@ const SPEED = 135
 const ROTATE_SPEED = 100
 
 # Player vars
-var player_anim_dir = "l"
+var player_anim_dir = "left"
 var player_anim_mode = "idle"
 var index
-
+var animation
 
 func init(_index):
 	self.index = _index
@@ -26,13 +26,14 @@ func _physics_process(_delta):
 
 func _process(_delta):
 	AnimationLoop()
+	
 	SpellAnimationLoop()
 
 
 func MovementLoop():
 	# 360 degree movement! (with no deadzone)
 	var input_dir = Input.get_vector("move_left" + str(index), "move_right" + str(index), "move_up" + str(index), "move_down" + str(index)).normalized()
-	
+
 	# 360 with deadzone
 	#var input_dir = Vector2(Input.get_axis("move_left" + str(index), "move_right" + str(index)), Input.get_axis("move_up" + str(index), "move_down" + str(index)))
 	velocity = input_dir * SPEED
@@ -53,7 +54,24 @@ func AimLoop():
 
 
 func AnimationLoop():
-	pass
+	var move_dir = Vector2.ZERO
+	move_dir.x = int(Input.is_action_pressed("move_right" + str(index))) - int(Input.is_action_pressed("move_left" + str(index)))
+	move_dir.y = (int(Input.is_action_pressed("move_down" + str(index))) - int(Input.is_action_pressed("move_up" + str(index)))) / float(2)
+	if move_dir != Vector2.ZERO:
+		player_anim_mode = "run"
+	else:
+		player_anim_mode = "idle"
+	match move_dir:
+		Vector2(-1,0):
+			player_anim_dir = "left"
+		Vector2(1,0):
+			player_anim_dir = "right"
+		Vector2(0,.5):
+			player_anim_dir = "down"
+		Vector2(0,-.5):
+			player_anim_dir = "up"
+	animation = player_anim_mode + "_" + player_anim_dir
+	$PlayerSprite/AnimationPlayer.play(animation)
 
 func SpellAnimationLoop():
 	var aim_dir = Input.get_vector("aim_left" + str(index), "aim_right" + str(index), "aim_up" + str(index), "aim_down" + str(index))
