@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://c2hw12giijv64"]
+[gd_scene load_steps=3 format=3 uid="uid://ib470vhpf0th"]
 
 [ext_resource type="Texture2D" uid="uid://dumjt4epuge1u" path="res://icon.svg" id="1_w4oq8"]
 [ext_resource type="Script" path="res://GameObjects/Enemies/MissileSpawner.gd" id="2_r2881"]

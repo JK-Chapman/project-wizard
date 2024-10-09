@@ -11,6 +11,7 @@ const ROTATE_SPEED = 100
 # Player vars
 var player_anim_dir = "left"
 var player_anim_mode = "idle"
+var aim_dir = Vector2.ZERO
 var index
 var animation
 
@@ -26,9 +27,11 @@ func _physics_process(_delta):
 
 func _process(_delta):
 	AnimationLoop()
-	
 	SpellAnimationLoop()
 
+func _unhandled_input(event):
+	if !spell_blast_active and Input.is_action_just_pressed("blast" + str(index)) and aim_dir != Vector2.ZERO:
+		spell_blast_active = true
 
 func MovementLoop():
 	# 360 degree movement! (with no deadzone)
@@ -47,9 +50,10 @@ func MovementLoop():
 
 
 func AimLoop():
-	var aim_dir = Input.get_vector("aim_left" + str(index), "aim_right" + str(index), "aim_up" + str(index), "aim_down" + str(index))
-	if aim_dir != Vector2.ZERO:
+	aim_dir = Input.get_vector("aim_left" + str(index), "aim_right" + str(index), "aim_up" + str(index), "aim_down" + str(index))
+	if aim_dir != Vector2.ZERO and !spell_blast_active:
 		$PlayerSpellPoint.rotation = aim_dir.angle()
+		#print(str(aim_dir))
 		#lerp_angle($PlayerSpellPoint.rotation, aim_dir.angle(), 0.5)
 
 
@@ -79,8 +83,15 @@ func SpellAnimationLoop():
 	
 	if spell_blast_active:
 		spell_animation = "blast"
+		spell_anim_player.play(spell_animation)
+		await spell_anim_player.animation_finished
+		spell_blast_active = false
+		return
 	elif aim_dir != Vector2.ZERO && !spell_blast_active:
 		spell_animation = "cast"
-		
+	
 	spell_anim_player.play(spell_animation)
 
+func _on_area_2d_area_entered(area):
+	if area.is_in_group("projectile"):
+		area.deflect(aim_dir)

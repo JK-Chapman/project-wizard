@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://cwtj7274tsgs"]
+[gd_scene load_steps=19 format=3 uid="uid://cwtj7274tsgs"]
 
 [ext_resource type="Texture2D" uid="uid://cvr3n7sfx4lb7" path="res://Assets/AnimationSheets/JesterMoveset.png" id="1_h08ra"]
 [ext_resource type="Script" path="res://GameObjects/Player/Player.gd" id="1_wpc8h"]
@@ -153,13 +153,27 @@ _data = {
 }
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_fb4g0"]
-radius = 4.0
+radius = 3.0
 height = 12.0
+
+[sub_resource type="Animation" id="Animation_y8dan"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Area2D/CollisionPolygon2D:disabled")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
 [sub_resource type="Animation" id="Animation_mo686"]
 resource_name = "blast"
-length = 0.5
-loop_mode = 1
+length = 0.3
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -220,10 +234,10 @@ tracks/1/path = NodePath("Area2D/CollisionPolygon2D:disabled")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(),
-"transitions": PackedFloat32Array(),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": []
+"values": [true]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -269,6 +283,7 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ontu1"]
 _data = {
+"RESET": SubResource("Animation_y8dan"),
 "blast": SubResource("Animation_mo686"),
 "cast": SubResource("Animation_w8yow"),
 "inactive": SubResource("Animation_n247q")
@@ -285,7 +300,7 @@ position = Vector2(2, -3)
 scale = Vector2(1.14844, 1.125)
 texture = ExtResource("1_h08ra")
 hframes = 70
-frame = 10
+frame = 18
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="PlayerSprite"]
 libraries = {
@@ -309,15 +324,18 @@ scale = Vector2(1.02343, 0.953134)
 texture = ExtResource("3_0egyb")
 hframes = 6
 
-[node name="Area2D" type="Area2D" parent="PlayerSpellPoint/SpellPointSprite"]
+[node name="Area2D" type="Area2D" parent="PlayerSpellPoint/SpellPointSprite" groups=["deflect"]]
 position = Vector2(-0.333334, -1.66666)
 collision_layer = 8
 collision_mask = 4
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="PlayerSpellPoint/SpellPointSprite/Area2D"]
 polygon = PackedVector2Array(-7.16667, -5.83334, 7.83333, -5.83334, 7.83333, 2.5, 0.333334, 9.16666, -7.16667, 2.5)
+disabled = true
 
 [node name="SpellPointAnimPlayer" type="AnimationPlayer" parent="PlayerSpellPoint/SpellPointSprite"]
 libraries = {
 "": SubResource("AnimationLibrary_ontu1")
 }
+
+[connection signal="area_entered" from="PlayerSpellPoint/SpellPointSprite/Area2D" to="." method="_on_area_2d_area_entered"]
