@@ -5,7 +5,7 @@
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ctiyg"]
 radius = 1.42814
-height = 25.7134
+height = 17.5792
 
 [node name="Missile" type="Area2D" groups=["projectile"]]
 scale = Vector2(0.7, 0.7)
@@ -15,10 +15,12 @@ script = ExtResource("1_42ck3")
 
 [node name="MissileSprite" type="Sprite2D" parent="."]
 texture_filter = 1
+position = Vector2(-0.571429, 0)
+scale = Vector2(0.767857, 1)
 texture = ExtResource("1_m8geq")
 
 [node name="MissileHitbox" type="CollisionShape2D" parent="."]
-position = Vector2(-2.639, 0.434)
+position = Vector2(-2.63899, 0.434)
 rotation = 1.5708
 shape = SubResource("CapsuleShape2D_ctiyg")
 

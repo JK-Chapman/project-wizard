@@ -15,6 +15,7 @@ var acceleration = Vector2.ZERO
 var target = null
 var target_index = null
 var deflect_dir
+var drag = 0.12
 
 
 func init():
@@ -23,22 +24,29 @@ func init():
 func start(_position):
 	position = _position
 	rotation += randf_range(-0.09, 0.09)
-	velocity = transform.x * speed_stages[missile_stage]
+	velocity = transform.x * speed_stages[missile_stage] * 3
 	set_random_target()
 
-func seek():
-	var steer = Vector2.ZERO
-	if target:
-		var desired = (target.position - position).normalized() * speed_stages[missile_stage]
-		steer = (desired - velocity).normalized() * steer_forces[missile_stage]
-	return steer
-
 func _physics_process(delta):
-	acceleration += seek()
-	velocity += acceleration * delta
-	velocity = velocity.limit_length(speed_stages[missile_stage])
-	rotation = velocity.angle()
+	var direction = transform.x
+	
+	if target:
+		direction = global_position.direction_to(target.global_position)
+	
+	var desired_velocity = direction * speed_stages[missile_stage]
+	var previous_velocity = velocity
+	var change = (desired_velocity - velocity) * drag
+	
+	velocity += change
+	
 	position += velocity * delta
+	look_at(global_position + velocity)
+	
+	#acceleration += seek()
+	#velocity += acceleration * delta
+	#velocity = velocity.limit_length(speed_stages[missile_stage])
+	#rotation = velocity.angle()
+	#position += velocity * delta
 
 func _on_Missile_body_entered(body):
 	explode()
@@ -54,7 +62,6 @@ func deflect(direction):
 		missile_stage += 1
 	
 	$TrackingTimer.start()
-	pass
 
 func explode():
 	#$Particles2D.emitting = false
@@ -69,8 +76,6 @@ func set_random_target():
 	
 	# If curr_index is null, we just instantiated the object and need to set an initial target.
 	# This if statement excludes the current target if it exists.
-	
-	print(target_index)
 	if (target_index != null and p_dicts_copy.size() > 1):
 		p_dicts_copy.erase(target_index)
 		target_index = null
