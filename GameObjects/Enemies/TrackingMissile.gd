@@ -1,4 +1,4 @@
-extends Area2D
+extends CharacterBody2D
 
 #@export var speed_stage = 0
 #@export var steer_force = 130.0
@@ -6,11 +6,11 @@ extends Area2D
 
 # missile stages
 var MAX_STAGE = 3
-var speed_stages = [150.0, 180.0, 275.0, 300.0]
+var speed_stages = [100.0, 180.0, 275.0, 300.0]
 var steer_forces = [125.0, 165.0, 165.0, 300.0]
 
 # missile vars
-var velocity = Vector2.ZERO
+var current_velocity = Vector2.ZERO
 var acceleration = Vector2.ZERO
 var target = null
 var target_index = null
@@ -24,7 +24,7 @@ func init():
 func start(_position):
 	position = _position
 	rotation += randf_range(-0.09, 0.09)
-	velocity = transform.x * speed_stages[missile_stage] * 3
+	current_velocity = transform.x * speed_stages[missile_stage] * 3
 	set_random_target()
 
 func _physics_process(delta):
@@ -34,13 +34,30 @@ func _physics_process(delta):
 		direction = global_position.direction_to(target.global_position)
 	
 	var desired_velocity = direction * speed_stages[missile_stage]
-	var previous_velocity = velocity
-	var change = (desired_velocity - velocity) * drag
+	var previous_velocity = current_velocity
+	var change = (desired_velocity - current_velocity) * drag
 	
-	velocity += change
+	current_velocity += change
 	
-	position += velocity * delta
-	look_at(global_position + velocity)
+	var collision = move_and_collide(current_velocity * delta)
+	if collision:
+		var collider = collision.get_collider()
+		
+		if collider.is_in_group("player"):
+			explode()
+		else:
+			print("the current")
+			print(current_velocity)
+			print("the normal")
+			print(collision.get_normal())
+			current_velocity = current_velocity.bounce(collision.get_normal())
+			print("after bounce")
+			print(current_velocity)
+	
+	#position += velocity * delta
+	look_at(global_position + current_velocity)
+	
+
 	
 	#acceleration += seek()
 	#velocity += acceleration * delta
@@ -55,7 +72,7 @@ func deflect(direction):
 	target = null
 	
 	rotation += randf_range(-15, 15)
-	velocity = velocity.abs() * direction.normalized()
+	current_velocity = current_velocity.abs() * direction.normalized()
 	acceleration = acceleration.abs() * direction.normalized()
 	
 	if (missile_stage < MAX_STAGE):
