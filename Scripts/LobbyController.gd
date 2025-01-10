@@ -64,16 +64,15 @@ func RemovePlayer(index):
 #func _process(delta):
 #	pass
 
-
-func _on_StartZone_body_entered(body):
-	if body.is_in_group("Player"):
+func _on_start_zone_body_entered(body: Node2D) -> void:
+	if body.is_in_group("player"):
 		num_players_ready += 1
 		print("DEBUG: num_players_ready is " + str(num_players_ready))
 		if num_players_ready == GameManager.player_dicts.keys().size():
-			GameManager.load_random_level("DebugBladeLevel")
+			print("All players are ready.")
+			#GameManager.load_random_level("DebugBladeLevel")
 
-
-func _on_StartZone_body_exited(body):
-	if body.is_in_group("Player"):
+func _on_start_zone_body_exited(body: Node2D) -> void:
+	if body.is_in_group("player"):
 		num_players_ready -= 1
 		print("DEBUG: num_players_ready is " + str(num_players_ready))
