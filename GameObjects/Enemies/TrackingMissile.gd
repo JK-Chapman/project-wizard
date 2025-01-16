@@ -71,19 +71,20 @@ func explode():
 	queue_free()
 
 func set_random_target():
-	var p_dicts_copy = GameManager.player_dicts.duplicate(true)
+	var p_array_copy = GameManager.player_array.duplicate(true)
 	var player
 	
 	# If curr_index is null, we just instantiated the object and need to set an initial target.
 	# This if statement excludes the current target if it exists.
-	if (target_index != null and p_dicts_copy.size() > 1):
-		p_dicts_copy.erase(target_index)
+	if (target_index != null and p_array_copy.size() > 1):
+		p_array_copy.remove_at(target_index)
 		target_index = null
 	
-	target_index = p_dicts_copy.keys()[randi() % p_dicts_copy.size()]
-	player = p_dicts_copy[target_index]
+	print(p_array_copy)
+	target_index = p_array_copy.pick_random().index
+	player = p_array_copy[target_index]
 	
-	target = get_parent().get_node(player[1])
+	target = get_parent().get_node("Player" + str(player.index))
 
 
 func _on_tracking_timer_timeout():

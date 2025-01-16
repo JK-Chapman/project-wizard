@@ -15,11 +15,10 @@ var aim_dir = Vector2.ZERO
 var index
 var animation
 
-func init(_index):
+func init(_index, _color_hex):
 	self.index = _index
 	self.set_name("Player" + str(index))
-	get_node("PlayerSprite").self_modulate = GameManager.player_dicts[index][0]
-
+	get_node("PlayerSprite").self_modulate = _color_hex
 
 func _physics_process(_delta):
 	MovementLoop()
