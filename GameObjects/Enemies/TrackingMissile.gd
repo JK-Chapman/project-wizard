@@ -74,7 +74,6 @@ func explode():
 
 func set_random_target():
 	var p_array_copy = GameManager.player_array.duplicate(true)
-	var player
 	
 	# If target_index is null, we just instantiated the object and need to set an initial target.
 	# This if statement excludes the current target if it exists.
@@ -86,8 +85,7 @@ func set_random_target():
 		target = null
 	else: # otherwise set a new target based on a random player index
 		target_index = p_array_copy.pick_random().index
-		player = p_array_copy[target_index]
-		target = get_parent().get_node("Player" + str(player.index))
+		target = get_parent().get_node("Player" + str(target_index))
 
 
 func _on_tracking_timer_timeout():

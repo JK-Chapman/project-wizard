@@ -58,6 +58,16 @@ func _process(_delta):
 		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 3)]
 		var p = get_node("Player" + str(player_vars.index))
 		RemovePlayer(player_vars)
+		
+	# Spawn / Remove Player3
+	if (!GameManager.player_array.filter(func(p): return p.index == 4) && Input.is_action_just_released("start4")):
+		var player_vars = PlayerVars.new(4, "#c88e1a")
+		GameManager.player_array.append(player_vars)
+		SpawnPlayer(player_vars)
+	elif (GameManager.player_array.filter(func(p): return p.index == 4) && Input.is_action_just_released("back4")):
+		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 4)]
+		var p = get_node("Player" + str(player_vars.index))
+		RemovePlayer(player_vars)
 
 func SpawnPlayer(player_vars):
 	var player_inst = player.instantiate()
