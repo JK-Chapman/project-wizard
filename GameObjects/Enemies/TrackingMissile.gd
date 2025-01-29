@@ -30,8 +30,10 @@ func start(_position):
 func _physics_process(delta):
 	var direction = transform.x
 	
-	if target:
+	if is_instance_valid(target):
 		direction = global_position.direction_to(target.global_position)
+	elif $TrackingTimer.is_stopped(): # our target is gone, pick a new one
+		set_random_target()
 	
 	var desired_velocity = direction * speed_stages[missile_stage]
 	var previous_velocity = velocity
@@ -74,17 +76,18 @@ func set_random_target():
 	var p_array_copy = GameManager.player_array.duplicate(true)
 	var player
 	
-	# If curr_index is null, we just instantiated the object and need to set an initial target.
+	# If target_index is null, we just instantiated the object and need to set an initial target.
 	# This if statement excludes the current target if it exists.
 	if (target_index != null and p_array_copy.size() > 1):
 		p_array_copy.remove_at(target_index)
-		target_index = null
 	
-	print(p_array_copy)
-	target_index = p_array_copy.pick_random().index
-	player = p_array_copy[target_index]
-	
-	target = get_parent().get_node("Player" + str(player.index))
+	# can't have a target if there are no possible targets! :D
+	if p_array_copy.size() == 0:
+		target = null
+	else: # otherwise set a new target based on a random player index
+		target_index = p_array_copy.pick_random().index
+		player = p_array_copy[target_index]
+		target = get_parent().get_node("Player" + str(player.index))
 
 
 func _on_tracking_timer_timeout():

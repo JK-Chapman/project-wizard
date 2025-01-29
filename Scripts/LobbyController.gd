@@ -21,67 +21,43 @@ func _ready():
 	
 func _process(_delta):
 	# Spawn / Remove Player0
-	if (!GameManager.player_array.filter(func(player): return player.index == 0) && Input.is_action_just_released("start0")):
+	if (!GameManager.player_array.filter(func(p): return p.index == 0) && Input.is_action_just_released("start0")):
 		var player_vars = PlayerVars.new(0, "#a20303")
-		GameManager.player_array.append(PlayerVars.new(0, "#a20303"))
-		print(GameManager.player_array)
+		GameManager.player_array.append(player_vars)
 		SpawnPlayer(player_vars)
-	elif (GameManager.player_array.filter(func(player): return player.index == 0) && Input.is_action_just_released("back0")):
-		var player_vars = GameManager.player_array.filter(func(player): return player.index == 0)
+	elif (GameManager.player_array.filter(func(p): return p.index == 0) && Input.is_action_just_released("back0")):
+		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 0)]
+		var p = get_node("Player" + str(player_vars.index))
 		RemovePlayer(player_vars)
-		
-		
-		# TODO: FINISH SPAWN HANDLERS FOR OTHER THREE PLAYERS!!!
-		# Spawn / Remove Player1
-	if (!GameManager.player_array.filter(func(player): return player.index == 1) && Input.is_action_just_released("start1")):
-		var player_vars = PlayerVars.new(0, "#a20303")
-		GameManager.player_array.append(PlayerVars.new(0, "#a20303"))
-		print(GameManager.player_array)
+	
+	if (!GameManager.player_array.filter(func(p): return p.index == 1) && Input.is_action_just_released("start1")):
+		var player_vars = PlayerVars.new(1, "#1a2ac8")
+		GameManager.player_array.append(player_vars)
 		SpawnPlayer(player_vars)
-	elif (GameManager.player_array.filter(func(player): return player.index == 1) && Input.is_action_just_released("back1")):
-		var player_vars = GameManager.player_array.filter(func(player): return player.index == 0)
+	elif (GameManager.player_array.filter(func(p): return p.index == 1) && Input.is_action_just_released("back1")):
+		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 1)]
+		var p = get_node("Player" + str(player_vars.index))
 		RemovePlayer(player_vars)
 		
 		# Spawn / Remove Player2
-	if (!GameManager.player_array.filter(func(player): return player.index == 2) && Input.is_action_just_released("start2")):
-		var player_vars = PlayerVars.new(0, "#a20303")
-		GameManager.player_array.append(PlayerVars.new(0, "#a20303"))
-		print(GameManager.player_array)
+	if (!GameManager.player_array.filter(func(p): return p.index == 2) && Input.is_action_just_released("start2")):
+		var player_vars = PlayerVars.new(2, "#c81ac0")
+		GameManager.player_array.append(player_vars)
 		SpawnPlayer(player_vars)
-	elif (GameManager.player_array.filter(func(player): return player.index == 0) && Input.is_action_just_released("back2")):
-		var player_vars = GameManager.player_array.filter(func(player): return player.index == 0)
+	elif (GameManager.player_array.filter(func(p): return p.index == 2) && Input.is_action_just_released("back2")):
+		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 2)]
+		var p = get_node("Player" + str(player_vars.index))
 		RemovePlayer(player_vars)
 		
 		# Spawn / Remove Player3
-	if (!GameManager.player_array.filter(func(player): return player.index == 0) && Input.is_action_just_released("start3")):
-		var player_vars = PlayerVars.new(0, "#a20303")
-		GameManager.player_array.append(PlayerVars.new(0, "#a20303"))
-		print(GameManager.player_array)
+	if (!GameManager.player_array.filter(func(p): return p.index == 3) && Input.is_action_just_released("start3")):
+		var player_vars = PlayerVars.new(3, "#1fc81a")
+		GameManager.player_array.append(player_vars)
 		SpawnPlayer(player_vars)
-	elif (GameManager.player_array.filter(func(player): return player.index == 0) && Input.is_action_just_released("back3")):
-		var player_vars = GameManager.player_array.filter(func(player): return player.index == 0)
+	elif (GameManager.player_array.filter(func(p): return p.index == 3) && Input.is_action_just_released("back3")):
+		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 3)]
+		var p = get_node("Player" + str(player_vars.index))
 		RemovePlayer(player_vars)
-		
-	
-	#if (!GameManager.player_dicts.has(1)) && Input.is_action_just_released("start1"):
-		#SpawnPlayer("#2f7b00", 1)
-	#elif GameManager.player_dicts.has(1) && Input.is_action_just_released("back1"):
-		#RemovePlayer(1)
-	#
-	#if (!GameManager.player_dicts.has(2)) && Input.is_action_just_released("start2"):
-		#SpawnPlayer("#1303a2", 2)
-	#elif GameManager.player_dicts.has(2) && Input.is_action_just_released("back2"):
-		#RemovePlayer(2)
-	#
-	#if (!GameManager.player_dicts.has(3)) && Input.is_action_just_released("start3"):
-		#SpawnPlayer("#ffffff", 3)
-	#elif GameManager.player_dicts.has(3) && Input.is_action_just_released("back3"):
-		#RemovePlayer(3)
-	#
-	#if (!GameManager.player_dicts.has(4)) && Input.is_action_just_released("start4"):
-		#SpawnPlayer("#6C1684", 4)
-	#elif GameManager.player_dicts.has(4) && Input.is_action_just_released("back4"):
-		#RemovePlayer(4)
 
 func SpawnPlayer(player_vars):
 	var player_inst = player.instantiate()
@@ -92,15 +68,10 @@ func SpawnPlayer(player_vars):
 	add_child(player_inst)
 
 func RemovePlayer(player_vars):
-	var p = get_parent().get_node("Player" + str(player_vars.index))
+	var p = get_node("Player" + str(player_vars.index))
 	camera.remove_target(p)
 	p.queue_free()
 	GameManager.player_array.remove_at(GameManager.player_array.find(player_vars))
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
 
 func _on_start_zone_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
