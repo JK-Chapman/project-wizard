@@ -28,7 +28,7 @@ func _process(_delta):
 	AnimationLoop()
 	SpellAnimationLoop()
 
-func _unhandled_input(event):
+func _unhandled_input(_event):
 	if !spell_blast_active and Input.is_action_just_pressed("blast" + str(index)) and aim_dir != Vector2.ZERO:
 		spell_blast_active = true
 
@@ -77,7 +77,7 @@ func AnimationLoop():
 	$PlayerSprite/AnimationPlayer.play(animation)
 
 func SpellAnimationLoop():
-	var aim_dir = Input.get_vector("aim_left" + str(index), "aim_right" + str(index), "aim_up" + str(index), "aim_down" + str(index))
+	aim_dir = Input.get_vector("aim_left" + str(index), "aim_right" + str(index), "aim_up" + str(index), "aim_down" + str(index))
 	var spell_animation = "inactive"
 	
 	if spell_blast_active:

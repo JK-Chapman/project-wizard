@@ -36,7 +36,7 @@ func _physics_process(delta):
 		set_random_target()
 	
 	var desired_velocity = direction * speed_stages[missile_stage]
-	var previous_velocity = velocity
+	#var previous_velocity = velocity
 	var change = (desired_velocity - velocity) * drag
 	
 	velocity += change
@@ -50,7 +50,7 @@ func _physics_process(delta):
 	#rotation = velocity.angle()
 	#position += velocity * delta
 
-func _on_Missile_body_entered(body):
+func _on_Missile_body_entered(_body):
 	explode()
 
 func deflect(direction):

@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=4 uid="uid://4l7y7u8hxxc"]
+[gd_scene load_steps=4 format=4 uid="uid://4l7y7u8hxxc"]
 
 [ext_resource type="PackedScene" uid="uid://c5mb387h4suxp" path="res://Tilemaps/castle_tilemap.tscn" id="1_raa0a"]
 [ext_resource type="PackedScene" uid="uid://3toqf2ivdm4i" path="res://GameObjects/Cameras/ZoomCam.tscn" id="2_mgde4"]
+[ext_resource type="PackedScene" uid="uid://bwvxve8m53lud" path="res://GameObjects/Generic/PlayerSpawn.tscn" id="3_yya3l"]
 
 [node name="FfaDefault" type="Node2D"]
 
@@ -10,3 +11,32 @@ tile_map_data = PackedByteArray("AAAAAAAAAAADAAAAAAAAAAEAAAAGAAMAAAAAAAIAAAAGAAM
 
 [node name="ZoomCam" parent="." instance=ExtResource("2_mgde4")]
 position = Vector2(403, 235)
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+position = Vector2(-15, -28)
+
+[node name="SpawnPoint" parent="SpawnPoints" instance=ExtResource("3_yya3l")]
+position = Vector2(201, 412)
+player_index = 0
+
+[node name="SpawnPoint2" parent="SpawnPoints" instance=ExtResource("3_yya3l")]
+position = Vector2(657, 124)
+player_index = 1
+
+[node name="SpawnPoint3" parent="SpawnPoints" instance=ExtResource("3_yya3l")]
+position = Vector2(667, 409)
+player_index = 2
+
+[node name="SpawnPoint4" parent="SpawnPoints" instance=ExtResource("3_yya3l")]
+position = Vector2(203, 123)
+player_index = 3
+
+[node name="SpawnPoint5" parent="SpawnPoints" instance=ExtResource("3_yya3l")]
+position = Vector2(689, 407)
+player_index = 4
+
+[connection signal="ready" from="." to="SpawnPoints/SpawnPoint" method="_on_level_parent_ready"]
+[connection signal="ready" from="." to="SpawnPoints/SpawnPoint2" method="_on_level_parent_ready"]
+[connection signal="ready" from="." to="SpawnPoints/SpawnPoint3" method="_on_level_parent_ready"]
+[connection signal="ready" from="." to="SpawnPoints/SpawnPoint4" method="_on_level_parent_ready"]
+[connection signal="ready" from="." to="SpawnPoints/SpawnPoint5" method="_on_level_parent_ready"]

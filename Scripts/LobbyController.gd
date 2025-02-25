@@ -27,16 +27,15 @@ func _process(_delta):
 		SpawnPlayer(player_vars)
 	elif (GameManager.player_array.filter(func(p): return p.index == 0) && Input.is_action_just_released("back0")):
 		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 0)]
-		var p = get_node("Player" + str(player_vars.index))
 		RemovePlayer(player_vars)
 	
+	#Spawn / Remove Player1
 	if (!GameManager.player_array.filter(func(p): return p.index == 1) && Input.is_action_just_released("start1")):
 		var player_vars = PlayerVars.new(1, "#1a2ac8")
 		GameManager.player_array.append(player_vars)
 		SpawnPlayer(player_vars)
 	elif (GameManager.player_array.filter(func(p): return p.index == 1) && Input.is_action_just_released("back1")):
 		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 1)]
-		var p = get_node("Player" + str(player_vars.index))
 		RemovePlayer(player_vars)
 		
 		# Spawn / Remove Player2
@@ -46,7 +45,6 @@ func _process(_delta):
 		SpawnPlayer(player_vars)
 	elif (GameManager.player_array.filter(func(p): return p.index == 2) && Input.is_action_just_released("back2")):
 		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 2)]
-		var p = get_node("Player" + str(player_vars.index))
 		RemovePlayer(player_vars)
 		
 		# Spawn / Remove Player3
@@ -56,17 +54,15 @@ func _process(_delta):
 		SpawnPlayer(player_vars)
 	elif (GameManager.player_array.filter(func(p): return p.index == 3) && Input.is_action_just_released("back3")):
 		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 3)]
-		var p = get_node("Player" + str(player_vars.index))
 		RemovePlayer(player_vars)
 		
-	# Spawn / Remove Player3
+	# Spawn / Remove Player4
 	if (!GameManager.player_array.filter(func(p): return p.index == 4) && Input.is_action_just_released("start4")):
 		var player_vars = PlayerVars.new(4, "#c88e1a")
 		GameManager.player_array.append(player_vars)
 		SpawnPlayer(player_vars)
 	elif (GameManager.player_array.filter(func(p): return p.index == 4) && Input.is_action_just_released("back4")):
 		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 4)]
-		var p = get_node("Player" + str(player_vars.index))
 		RemovePlayer(player_vars)
 
 func SpawnPlayer(player_vars):
@@ -89,6 +85,7 @@ func _on_start_zone_body_entered(body: Node2D) -> void:
 		print("DEBUG: num_players_ready is " + str(num_players_ready))
 		if num_players_ready == GameManager.player_array.size():
 			print("All players are ready.")
+			GameManager.change_scene("Levels/FFADefault.tscn")
 			#GameManager.load_random_level("DebugBladeLevel")
 
 func _on_start_zone_body_exited(body: Node2D) -> void:

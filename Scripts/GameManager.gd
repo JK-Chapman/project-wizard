@@ -8,6 +8,5 @@ extends Node
 # first value in dict references index as well, second value is whether player is instantiated in current level.
 var player_array = Array([], TYPE_OBJECT, "Object", null)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func change_scene(next_scene):
+	get_tree().call_deferred("change_scene_to_file", next_scene)
