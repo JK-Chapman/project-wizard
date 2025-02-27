@@ -3,6 +3,7 @@ extends Area2D
 #@export var speed_stage = 0
 #@export var steer_force = 130.0
 @export var missile_stage = 0
+@export var missile_damage = 1
 
 # missile stages
 var MAX_STAGE = 3
@@ -13,7 +14,7 @@ var steer_forces = [125.0, 165.0, 165.0, 300.0]
 var velocity = Vector2.ZERO
 var acceleration = Vector2.ZERO
 var target = null
-var target_index = null
+var target_vars = null
 var deflect_dir
 var drag = 0.12
 
@@ -51,6 +52,9 @@ func _physics_process(delta):
 	#position += velocity * delta
 
 func _on_Missile_body_entered(_body):
+	if (_body.is_in_group("player")):
+		_body.take_damage(missile_damage)
+		pass
 	explode()
 
 func deflect(direction):
@@ -73,19 +77,19 @@ func explode():
 	queue_free()
 
 func set_random_target():
-	var p_array_copy = GameManager.player_array.duplicate(true)
+	var p_array_copy = GameManager.player_array.duplicate(true).filter(func(p): return p.player_dead == false)
 	
-	# If target_index is null, we just instantiated the object and need to set an initial target.
+	# If target_vars is null, we just instantiated the object and need to set an initial target.
 	# This if statement excludes the current target if it exists.
-	if (target_index != null and p_array_copy.size() > 1):
-		p_array_copy.remove_at(target_index)
+	if (target_vars != null and p_array_copy.size() > 1):
+		p_array_copy.erase(target_vars)
 	
 	# can't have a target if there are no possible targets! :D
 	if p_array_copy.size() == 0:
 		target = null
 	else: # otherwise set a new target based on a random player index
-		target_index = p_array_copy.pick_random().index
-		target = get_parent().get_node("Player" + str(target_index))
+		target_vars = p_array_copy.pick_random()
+		target = get_parent().get_node("Player" + str(target_vars.index))
 
 
 func _on_tracking_timer_timeout():

@@ -92,3 +92,7 @@ func _on_start_zone_body_exited(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		num_players_ready -= 1
 		print("DEBUG: num_players_ready is " + str(num_players_ready))
+
+
+func _on_lobby_loaded_timeout() -> void:
+	get_tree().call_group("player", "set_player_state", Player.PlayerState.NORMAL)

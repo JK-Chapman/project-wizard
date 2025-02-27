@@ -1,8 +1,39 @@
-[gd_scene load_steps=19 format=3 uid="uid://cwtj7274tsgs"]
+[gd_scene load_steps=21 format=3 uid="uid://cwtj7274tsgs"]
 
-[ext_resource type="Texture2D" uid="uid://cvr3n7sfx4lb7" path="res://Assets/AnimationSheets/JesterMoveset.png" id="1_h08ra"]
 [ext_resource type="Script" path="res://GameObjects/Player/Player.gd" id="1_wpc8h"]
+[ext_resource type="Texture2D" uid="uid://bbxis1wdbknsx" path="res://Assets/AnimationSheets/JesterMovesetWDeathAnim.png" id="2_0porg"]
 [ext_resource type="Texture2D" uid="uid://ciipxxf2dnmvh" path="res://Assets/Placeholder/wizardblast.png" id="3_0egyb"]
+
+[sub_resource type="Animation" id="Animation_sehtm"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [14]
+}
+
+[sub_resource type="Animation" id="Animation_6ofl7"]
+resource_name = "death"
+length = 0.45
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0333333, 0.0666667, 0.1, 0.133333, 0.166667, 0.2, 0.233333),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [70, 71, 72, 73, 74, 75, 76, 77]
+}
 
 [sub_resource type="Animation" id="Animation_3ie5g"]
 resource_name = "idle_down"
@@ -142,6 +173,8 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_a3hy1"]
 _data = {
+"RESET": SubResource("Animation_sehtm"),
+"death": SubResource("Animation_6ofl7"),
 "idle_down": SubResource("Animation_3ie5g"),
 "idle_left": SubResource("Animation_vowxu"),
 "idle_right": SubResource("Animation_2eee5"),
@@ -298,9 +331,9 @@ script = ExtResource("1_wpc8h")
 texture_filter = 1
 position = Vector2(2, -3)
 scale = Vector2(1.14844, 1.125)
-texture = ExtResource("1_h08ra")
-hframes = 70
-frame = 18
+texture = ExtResource("2_0porg")
+hframes = 78
+frame = 14
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="PlayerSprite"]
 libraries = {

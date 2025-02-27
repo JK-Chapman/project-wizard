@@ -24,7 +24,7 @@ func remove_target(t):
 
 func _process(delta):
 	screen_size = DisplayServer.window_get_size()
-	margin = Vector2(screen_size.x * .05, screen_size.y * .05)
+	margin = Vector2(screen_size.x * .05, screen_size.y * .1)
 	
 	if !targets:
 		return

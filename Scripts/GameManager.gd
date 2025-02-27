@@ -10,3 +10,15 @@ var player_array = Array([], TYPE_OBJECT, "Object", null)
 
 func change_scene(next_scene):
 	get_tree().call_deferred("change_scene_to_file", next_scene)
+
+func SetPlayersIsDead(value:bool):
+	for player_vars in player_array:
+		player_vars.player_dead = value
+
+func SetPlayerIsDead(index:int, value:bool):
+	var player = player_array.filter(func(p): return p.index == index)
+	player[0].player_dead = value
+
+func ResetPlayerPoints():
+	for player_vars in player_array:
+		player_vars.points = 0

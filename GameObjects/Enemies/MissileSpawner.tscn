@@ -9,7 +9,7 @@ texture = ExtResource("1_w4oq8")
 script = ExtResource("2_r2881")
 
 [node name="Timer" type="Timer" parent="."]
-wait_time = 3.0
+wait_time = 4.0
 autostart = true
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

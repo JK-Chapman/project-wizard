@@ -32,7 +32,7 @@ func _on_level_parent_ready() -> void:
 	var player_vars = matching_arr[0]
 	
 	player_inst = player.instantiate()
-	player_inst.init(player_vars.index, player_vars.color_hex)
+	player_inst.init(player_vars.index, player_vars.color_hex, Player.PlayerState.IMMOBILIZED)
 	player_inst.position.x = self.position.x
 	player_inst.position.y = self.position.y
 	
