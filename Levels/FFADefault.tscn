@@ -7,12 +7,19 @@
 [ext_resource type="PackedScene" uid="uid://ib470vhpf0th" path="res://GameObjects/Enemies/MissileSpawner.tscn" id="5_hrnau"]
 [ext_resource type="AudioStream" uid="uid://wnwh0ivvyit4" path="res://Music/NormalLevel/big_shot.wav" id="6_viutk"]
 [ext_resource type="AudioStream" uid="uid://bng4jy053dh7c" path="res://Music/NormalLevel/bramble_blast.wav" id="7_gulgd"]
+[ext_resource type="AudioStream" uid="uid://cfolo3uda53bc" path="res://Music/NormalLevel/spelunky_egg.wav" id="8_gulgd"]
+[ext_resource type="AudioStream" uid="uid://bgqp3krm0bqjk" path="res://Music/NormalLevel/bloody_stream.wav" id="9_g7lb4"]
+[ext_resource type="AudioStream" uid="uid://cq7p0sumdxmol" path="res://Music/NormalLevel/spelunky_deathmatch.wav" id="10_y30l0"]
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_ncon6"]
 playback_mode = 1
-streams_count = 2
+streams_count = 5
 stream_0/stream = ExtResource("6_viutk")
 stream_1/stream = ExtResource("7_gulgd")
+stream_2/stream = ExtResource("8_gulgd")
+stream_2/weight = 0.1
+stream_3/stream = ExtResource("9_g7lb4")
+stream_4/stream = ExtResource("10_y30l0")
 
 [node name="FfaDefault" type="Node2D" unique_id=2090303789]
 script = ExtResource("1_ew1sm")
@@ -143,7 +150,7 @@ position = Vector2(402, 62)
 
 [node name="GameMusic" type="AudioStreamPlayer" parent="." unique_id=1234683879]
 stream = SubResource("AudioStreamRandomizer_ncon6")
-volume_db = -10.036
+volume_db = -20.0
 
 [connection signal="ready" from="." to="SpawnPoints/SpawnPoint" method="_on_level_parent_ready"]
 [connection signal="ready" from="." to="SpawnPoints/SpawnPoint2" method="_on_level_parent_ready"]

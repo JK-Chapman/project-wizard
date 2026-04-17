@@ -372,6 +372,7 @@ libraries/ = SubResource("AnimationLibrary_ontu1")
 
 [node name="DeflectSound" type="AudioStreamPlayer2D" parent="." unique_id=649184984]
 stream = ExtResource("4_qedkl")
+volume_db = -10.0
 
 [node name="DeathSound" type="AudioStreamPlayer2D" parent="." unique_id=932213901]
 stream = ExtResource("5_y85w3")

@@ -285,6 +285,22 @@ aim_right3={
 "events": [Object(InputEventJoypadMotion,"resource_local_to_scene":false,"resource_name":"","device":3,"axis":2,"axis_value":1.0,"script":null)
 ]
 }
+aim_up4={
+"deadzone": 0.2,
+"events": []
+}
+aim_down4={
+"deadzone": 0.2,
+"events": []
+}
+aim_left4={
+"deadzone": 0.2,
+"events": []
+}
+aim_right4={
+"deadzone": 0.2,
+"events": []
+}
 
 [layer_names]
 

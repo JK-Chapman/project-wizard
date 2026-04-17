@@ -7,8 +7,8 @@ extends Area2D
 
 # missile stages
 var MAX_STAGE = 9
-var speed_stages = [150.0, 180.0, 275.0, 300.0, 320.0, 340.0, 360.0, 400.0, 500.0, 600.0, 900.0]
-var steer_forces = [125.0, 165.0, 165.0, 300.0, 300.0, 300.0, 300.0, 300.0, 340.0, 400.0, 500.0]
+var speed_stages = [125.0, 150.0, 175.0, 200.0, 215.0, 230.0, 245.0, 280.0, 320.0, 360.0, 410.0, 450.0, 500.0, 550.0, 610.0, 680.0, 730.0, 800.0, 850.0, 910.0, 960.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1100.0, 1200.0, 1300.0, 1400.0, 1500.0]
+var steer_forces = [125.0, 165.0, 165.0, 300.0, 300.0, 300.0, 300.0, 300.0, 330.0, 330.0, 350.0, 370.0, 380.0, 480.0, 580.0, 580.0, 580.0, 580.0]
 
 # missile vars
 var velocity = Vector2.ZERO
@@ -20,6 +20,7 @@ var drag = 0.12
 
 
 func init():
+	missile_stage = randi_range(0, 4);
 	set_random_target()
 
 func start(_position):
@@ -66,15 +67,15 @@ func deflect(direction):
 	velocity = velocity.abs() * direction.normalized()
 	acceleration = acceleration.abs() * direction.normalized()
 	
-	if (missile_stage < MAX_STAGE):
+	if (missile_stage < speed_stages.size()):
 		missile_stage += 1
 	
 	$TrackingTimer.start()
 
 func explode():
+	$MissileExplode.play()
 	#$Particles2D.emitting = false
 	set_physics_process(false)
-	$MissileExplode.play()
 	#$AnimationPlayer.play("explode")
 	#await $AnimationPlayer.animation_finished
 	queue_free()
