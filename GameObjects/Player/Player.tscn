@@ -1,8 +1,10 @@
-[gd_scene load_steps=21 format=3 uid="uid://cwtj7274tsgs"]
+[gd_scene format=3 uid="uid://cwtj7274tsgs"]
 
-[ext_resource type="Script" path="res://GameObjects/Player/Player.gd" id="1_wpc8h"]
+[ext_resource type="Script" uid="uid://d1nip2g5ocxoh" path="res://GameObjects/Player/Player.gd" id="1_wpc8h"]
 [ext_resource type="Texture2D" uid="uid://bbxis1wdbknsx" path="res://Assets/AnimationSheets/JesterMovesetWDeathAnim.png" id="2_0porg"]
 [ext_resource type="Texture2D" uid="uid://ciipxxf2dnmvh" path="res://Assets/Placeholder/wizardblast.png" id="3_0egyb"]
+[ext_resource type="AudioStream" uid="uid://bx66r65xgjshv" path="res://SoundEffects/deflect.wav" id="4_qedkl"]
+[ext_resource type="AudioStream" uid="uid://cinvtl4xmh5yo" path="res://SoundEffects/player_dead.wav" id="5_y85w3"]
 
 [sub_resource type="Animation" id="Animation_sehtm"]
 length = 0.001
@@ -173,16 +175,16 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_a3hy1"]
 _data = {
-"RESET": SubResource("Animation_sehtm"),
-"death": SubResource("Animation_6ofl7"),
-"idle_down": SubResource("Animation_3ie5g"),
-"idle_left": SubResource("Animation_vowxu"),
-"idle_right": SubResource("Animation_2eee5"),
-"idle_up": SubResource("Animation_fdduo"),
-"run_down": SubResource("Animation_cttgl"),
-"run_left": SubResource("Animation_hf1nr"),
-"run_right": SubResource("Animation_e50l8"),
-"run_up": SubResource("Animation_twn40")
+&"RESET": SubResource("Animation_sehtm"),
+&"death": SubResource("Animation_6ofl7"),
+&"idle_down": SubResource("Animation_3ie5g"),
+&"idle_left": SubResource("Animation_vowxu"),
+&"idle_right": SubResource("Animation_2eee5"),
+&"idle_up": SubResource("Animation_fdduo"),
+&"run_down": SubResource("Animation_cttgl"),
+&"run_left": SubResource("Animation_hf1nr"),
+&"run_right": SubResource("Animation_e50l8"),
+&"run_up": SubResource("Animation_twn40")
 }
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_fb4g0"]
@@ -316,18 +318,18 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ontu1"]
 _data = {
-"RESET": SubResource("Animation_y8dan"),
-"blast": SubResource("Animation_mo686"),
-"cast": SubResource("Animation_w8yow"),
-"inactive": SubResource("Animation_n247q")
+&"RESET": SubResource("Animation_y8dan"),
+&"blast": SubResource("Animation_mo686"),
+&"cast": SubResource("Animation_w8yow"),
+&"inactive": SubResource("Animation_n247q")
 }
 
-[node name="Player" type="CharacterBody2D" groups=["player"]]
+[node name="Player" type="CharacterBody2D" unique_id=1374164170 groups=["player"]]
 collision_layer = 2
 collision_mask = 3
 script = ExtResource("1_wpc8h")
 
-[node name="PlayerSprite" type="Sprite2D" parent="."]
+[node name="PlayerSprite" type="Sprite2D" parent="." unique_id=1332338770]
 texture_filter = 1
 position = Vector2(2, -3)
 scale = Vector2(1.14844, 1.125)
@@ -335,19 +337,18 @@ texture = ExtResource("2_0porg")
 hframes = 78
 frame = 14
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="PlayerSprite"]
-libraries = {
-"": SubResource("AnimationLibrary_a3hy1")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="PlayerSprite" unique_id=1449453382]
+libraries/ = SubResource("AnimationLibrary_a3hy1")
 
-[node name="PlayerHitbox" type="CollisionShape2D" parent="." groups=["player"]]
+[node name="PlayerHitbox" type="CollisionShape2D" parent="." unique_id=1497879729 groups=["player"]]
 position = Vector2(0, -1)
 shape = SubResource("CapsuleShape2D_fb4g0")
 
-[node name="PlayerSpellPoint" type="Node2D" parent="."]
+[node name="PlayerSpellPoint" type="Node2D" parent="." unique_id=1525849958]
 position = Vector2(-1, 1)
 
-[node name="SpellPointSprite" type="Sprite2D" parent="PlayerSpellPoint"]
+[node name="SpellPointSprite" type="Sprite2D" parent="PlayerSpellPoint" unique_id=547129202]
+visible = false
 light_mask = 2
 visibility_layer = 2
 texture_filter = 1
@@ -357,18 +358,22 @@ scale = Vector2(1.02343, 0.953134)
 texture = ExtResource("3_0egyb")
 hframes = 6
 
-[node name="Area2D" type="Area2D" parent="PlayerSpellPoint/SpellPointSprite" groups=["deflect"]]
+[node name="Area2D" type="Area2D" parent="PlayerSpellPoint/SpellPointSprite" unique_id=302462585 groups=["deflect"]]
 position = Vector2(-0.333334, -1.66666)
 collision_layer = 8
 collision_mask = 4
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="PlayerSpellPoint/SpellPointSprite/Area2D"]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="PlayerSpellPoint/SpellPointSprite/Area2D" unique_id=1269107565]
 polygon = PackedVector2Array(-7.16667, -5.83334, 7.83333, -5.83334, 7.83333, 2.5, 0.333334, 9.16666, -7.16667, 2.5)
 disabled = true
 
-[node name="SpellPointAnimPlayer" type="AnimationPlayer" parent="PlayerSpellPoint/SpellPointSprite"]
-libraries = {
-"": SubResource("AnimationLibrary_ontu1")
-}
+[node name="SpellPointAnimPlayer" type="AnimationPlayer" parent="PlayerSpellPoint/SpellPointSprite" unique_id=1271494375]
+libraries/ = SubResource("AnimationLibrary_ontu1")
+
+[node name="DeflectSound" type="AudioStreamPlayer2D" parent="." unique_id=649184984]
+stream = ExtResource("4_qedkl")
+
+[node name="DeathSound" type="AudioStreamPlayer2D" parent="." unique_id=932213901]
+stream = ExtResource("5_y85w3")
 
 [connection signal="area_entered" from="PlayerSpellPoint/SpellPointSprite/Area2D" to="." method="_on_area_2d_area_entered"]

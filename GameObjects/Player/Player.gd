@@ -44,6 +44,7 @@ func _process(_delta):
 func _unhandled_input(_event):
 	if !spell_blast_active and Input.is_action_just_pressed("blast" + str(index)) and aim_dir != Vector2.ZERO and player_state == PlayerState.NORMAL:
 		spell_blast_active = true
+		$DeflectSound.play()
 
 func MovementLoop():
 	# 360 degree movement! (with no deadzone)
@@ -123,7 +124,9 @@ func take_damage(damage):
 
 func kill_player():
 	player_state = PlayerState.DEAD
+	$DeathSound.play()
 	$PlayerSprite/AnimationPlayer.play("death")
+	spell_anim_player.play("inactive")
 	$PlayerHitbox.disabled = true
 	GameManager.SetPlayerIsDead(self.index, true)
 	#GameManager.player_array[GameManager.player_array.find(func(p): return p.index == self.index)].player_dead = true

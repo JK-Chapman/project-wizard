@@ -27,6 +27,7 @@ func _on_start_timer_timeout() -> void:
 	$ZoomCam/PlayerPoints3.hide()
 	$ZoomCam/PlayerPoints4.hide()
 	$ZoomCam/PlayerPoints5.hide()
+	$GameMusic.play()
 	get_tree().call_group("player", "set_player_state", Player.PlayerState.NORMAL)
 
 func CheckForVictory():
@@ -59,6 +60,7 @@ func ResetGame():
 	get_tree().reload_current_scene()
 
 func _on_round_end_timer_timeout() -> void:
+	$GameMusic.stop()
 	ResetGame()
 
 func _on_game_end_timer_timeout() -> void:

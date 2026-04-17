@@ -6,9 +6,9 @@ extends Area2D
 @export var missile_damage = 1
 
 # missile stages
-var MAX_STAGE = 3
-var speed_stages = [150.0, 180.0, 275.0, 300.0]
-var steer_forces = [125.0, 165.0, 165.0, 300.0]
+var MAX_STAGE = 9
+var speed_stages = [150.0, 180.0, 275.0, 300.0, 320.0, 340.0, 360.0, 400.0, 500.0, 600.0, 900.0]
+var steer_forces = [125.0, 165.0, 165.0, 300.0, 300.0, 300.0, 300.0, 300.0, 340.0, 400.0, 500.0]
 
 # missile vars
 var velocity = Vector2.ZERO
@@ -60,6 +60,8 @@ func _on_Missile_body_entered(_body):
 func deflect(direction):
 	target = null
 	
+	$MissileDeflected.play()
+	
 	rotation += randf_range(-15, 15)
 	velocity = velocity.abs() * direction.normalized()
 	acceleration = acceleration.abs() * direction.normalized()
@@ -72,6 +74,7 @@ func deflect(direction):
 func explode():
 	#$Particles2D.emitting = false
 	set_physics_process(false)
+	$MissileExplode.play()
 	#$AnimationPlayer.play("explode")
 	#await $AnimationPlayer.animation_finished
 	queue_free()
