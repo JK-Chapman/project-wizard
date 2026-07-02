@@ -4,6 +4,7 @@ extends Node
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
+const PlayerVars = preload("res://Scripts/PlayerVariables.gd")
 var camera
 var player = preload("res://GameObjects/Player/Player.tscn")
 var num_players_ready = 0
@@ -19,92 +20,79 @@ func _ready():
 	randomize()
 	
 func _process(_delta):
+	# Spawn / Remove Player0
+	if (!GameManager.player_array.filter(func(p): return p.index == 0) && Input.is_action_just_released("start0")):
+		var player_vars = PlayerVars.new(0, "#a20303")
+		GameManager.player_array.append(player_vars)
+		SpawnPlayer(player_vars)
+	elif (GameManager.player_array.filter(func(p): return p.index == 0) && Input.is_action_just_released("back0")):
+		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 0)]
+		RemovePlayer(player_vars)
 	
-	if (!GameManager.player_dicts.has(0)) && Input.is_action_just_released("start0"):
-		var player_inst = player.instantiate()
-		GameManager.player_dicts[0] = ["#a20303"]
-		player_inst.init(0)
-		player_inst.position.x = (randi() % int(size.x)) - (size.x/2) + centerpos.x
-		player_inst.position.y = (randi() % int(size.y)) - (size.y/2) + centerpos.y
-		camera.add_target(player_inst)
-		get_parent().add_child(player_inst)
-	elif GameManager.player_dicts.has(0) && Input.is_action_just_released("back0"):
-		var p = get_parent().get_node("Player0")
-		camera.remove_target(p)
-		p.queue_free()
-		GameManager.player_dicts.erase(0)
-	
-	if (!GameManager.player_dicts.has(1)) && Input.is_action_just_released("start1"):
-		var player_inst = player.instantiate()
-		GameManager.player_dicts[1] = ["#2f7b00"]
-		player_inst.init(1)
-		player_inst.position.x = (randi() % int(size.x)) - (size.x/2) + centerpos.x
-		player_inst.position.y = (randi() % int(size.y)) - (size.y/2) + centerpos.y
-		camera.add_target(player_inst)
-		get_parent().add_child(player_inst)
-	elif GameManager.player_dicts.has(1) && Input.is_action_just_released("back1"):
-		var p = get_parent().get_node("Player1")
-		camera.remove_target(p)
-		p.queue_free()
-		GameManager.player_dicts.erase(1)
+	#Spawn / Remove Player1
+	if (!GameManager.player_array.filter(func(p): return p.index == 1) && Input.is_action_just_released("start1")):
+		var player_vars = PlayerVars.new(1, "#1a2ac8")
+		GameManager.player_array.append(player_vars)
+		SpawnPlayer(player_vars)
+	elif (GameManager.player_array.filter(func(p): return p.index == 1) && Input.is_action_just_released("back1")):
+		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 1)]
+		RemovePlayer(player_vars)
 		
-	if (!GameManager.player_dicts.has(2)) && Input.is_action_just_released("start2"):
-		var player_inst = player.instantiate()
-		GameManager.player_dicts[2] = ["#1303a2"]
-		player_inst.init(2)
-		player_inst.position.x = (randi() % int(size.x)) - (size.x/2) + centerpos.x
-		player_inst.position.y = (randi() % int(size.y)) - (size.y/2) + centerpos.y
-		camera.add_target(player_inst)
-		get_parent().add_child(player_inst)
-	elif GameManager.player_dicts.has(2) && Input.is_action_just_released("back2"):
-		var p = get_parent().get_node("Player2")
-		camera.remove_target(p)
-		p.queue_free()
-		GameManager.player_dicts.erase(2)
+		# Spawn / Remove Player2
+	if (!GameManager.player_array.filter(func(p): return p.index == 2) && Input.is_action_just_released("start2")):
+		var player_vars = PlayerVars.new(2, "#c81ac0")
+		GameManager.player_array.append(player_vars)
+		SpawnPlayer(player_vars)
+	elif (GameManager.player_array.filter(func(p): return p.index == 2) && Input.is_action_just_released("back2")):
+		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 2)]
+		RemovePlayer(player_vars)
 		
-	if (!GameManager.player_dicts.has(3)) && Input.is_action_just_released("start3"):
-		var player_inst = player.instantiate()
-		GameManager.player_dicts[3] = ["#ffffff"]
-		player_inst.position.x = (randi() % int(size.x)) - (size.x/2) + centerpos.x
-		player_inst.position.y = (randi() % int(size.y)) - (size.y/2) + centerpos.y
-		player_inst.init(3)
-		camera.add_target(player_inst)
-		get_parent().add_child(player_inst)
-	elif GameManager.player_dicts.has(3) && Input.is_action_just_released("back3"):
-		var p = get_parent().get_node("Player3")
-		camera.remove_target(p)
-		p.queue_free()
-		GameManager.player_dicts.erase(3)
+		# Spawn / Remove Player3
+	if (!GameManager.player_array.filter(func(p): return p.index == 3) && Input.is_action_just_released("start3")):
+		var player_vars = PlayerVars.new(3, "#1fc81a")
+		GameManager.player_array.append(player_vars)
+		SpawnPlayer(player_vars)
+	elif (GameManager.player_array.filter(func(p): return p.index == 3) && Input.is_action_just_released("back3")):
+		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 3)]
+		RemovePlayer(player_vars)
 		
-	if (!GameManager.player_dicts.has(4)) && Input.is_action_just_released("start4"):
-		var player_inst = player.instantiate()
-		GameManager.player_dicts[4] = ["#6C1684"]
-		player_inst.position.x = (randi() % int(size.x)) - (size.x/2) + centerpos.x
-		player_inst.position.y = (randi() % int(size.y)) - (size.y/2) + centerpos.y
-		player_inst.init(4)
-		camera.add_target(player_inst)
-		get_parent().add_child(player_inst)
-	elif GameManager.player_dicts.has(4) && Input.is_action_just_released("back4"):
-		var p = get_parent().get_node("Player4")
-		camera.remove_target(p)
-		p.queue_free()
-		GameManager.player_dicts.erase(3)
+	# Spawn / Remove Player4
+	if (!GameManager.player_array.filter(func(p): return p.index == 4) && Input.is_action_just_released("start4")):
+		var player_vars = PlayerVars.new(4, "#c88e1a")
+		GameManager.player_array.append(player_vars)
+		SpawnPlayer(player_vars)
+	elif (GameManager.player_array.filter(func(p): return p.index == 4) && Input.is_action_just_released("back4")):
+		var player_vars = GameManager.player_array[GameManager.player_array.find(func(p): return p.index == 4)]
+		RemovePlayer(player_vars)
 
+func SpawnPlayer(player_vars):
+	var player_inst = player.instantiate()
+	player_inst.position.x = (randi() % int(size.x)) - (size.x/2) + centerpos.x
+	player_inst.position.y = (randi() % int(size.y)) - (size.y/2) + centerpos.y
+	player_inst.init(player_vars.index, player_vars.color_hex)
+	camera.add_target(player_inst)
+	add_child(player_inst)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func RemovePlayer(player_vars):
+	var p = get_node("Player" + str(player_vars.index))
+	camera.remove_target(p)
+	p.queue_free()
+	GameManager.player_array.remove_at(GameManager.player_array.find(player_vars))
 
-
-func _on_StartZone_body_entered(body):
-	if body.is_in_group("Player"):
+func _on_start_zone_body_entered(body: Node2D) -> void:
+	if body.is_in_group("player"):
 		num_players_ready += 1
 		print("DEBUG: num_players_ready is " + str(num_players_ready))
-		if num_players_ready == GameManager.player_dicts.keys().size():
-			GameManager.load_random_level("DebugBladeLevel")
+		if num_players_ready == GameManager.player_array.size():
+			print("All players are ready.")
+			GameManager.change_scene("Levels/FFADefault.tscn")
+			#GameManager.load_random_level("DebugBladeLevel")
 
-
-func _on_StartZone_body_exited(body):
-	if body.is_in_group("Player"):
+func _on_start_zone_body_exited(body: Node2D) -> void:
+	if body.is_in_group("player"):
 		num_players_ready -= 1
 		print("DEBUG: num_players_ready is " + str(num_players_ready))
+
+
+func _on_lobby_loaded_timeout() -> void:
+	get_tree().call_group("player", "set_player_state", Player.PlayerState.NORMAL)

@@ -1,38 +1,55 @@
 extends CharacterBody2D
+class_name Player
 
 # Spellpoint vars
 @onready var spell_anim_player = $PlayerSpellPoint/SpellPointSprite/SpellPointAnimPlayer
 var spell_blast_active = false
+
+#Enums
+enum PlayerState {
+	IMMOBILIZED,
+	DEAD,
+	NORMAL
+}
 
 # Consts
 const SPEED = 135
 const ROTATE_SPEED = 100
 
 # Player vars
-var player_anim_dir = "l"
+var player_anim_dir = "left"
 var player_anim_mode = "idle"
+var aim_dir = Vector2.ZERO
 var index
+var animation
+var player_state:PlayerState
+var health = 1
 
-
-func init(_index):
+func init(_index, _color_hex, _player_state=PlayerState.NORMAL):
 	self.index = _index
+	self.player_state = _player_state
 	self.set_name("Player" + str(index))
-	get_node("PlayerSprite").self_modulate = GameManager.player_dicts[index][0]
-
+	get_node("PlayerSprite").self_modulate = _color_hex
 
 func _physics_process(_delta):
-	MovementLoop()
+	if (player_state == PlayerState.NORMAL):
+		MovementLoop()
 	AimLoop()
 
 func _process(_delta):
-	AnimationLoop()
-	SpellAnimationLoop()
+	if (player_state != PlayerState.DEAD):
+		AnimationLoop()
+		SpellAnimationLoop()
 
+func _unhandled_input(_event):
+	if !spell_blast_active and Input.is_action_just_pressed("blast" + str(index)) and aim_dir != Vector2.ZERO and player_state == PlayerState.NORMAL:
+		spell_blast_active = true
+		$DeflectSound.play()
 
 func MovementLoop():
 	# 360 degree movement! (with no deadzone)
 	var input_dir = Input.get_vector("move_left" + str(index), "move_right" + str(index), "move_up" + str(index), "move_down" + str(index)).normalized()
-	
+
 	# 360 with deadzone
 	#var input_dir = Vector2(Input.get_axis("move_left" + str(index), "move_right" + str(index)), Input.get_axis("move_up" + str(index), "move_down" + str(index)))
 	velocity = input_dir * SPEED
@@ -46,23 +63,81 @@ func MovementLoop():
 
 
 func AimLoop():
-	var aim_dir = Input.get_vector("aim_left" + str(index), "aim_right" + str(index), "aim_up" + str(index), "aim_down" + str(index))
-	if aim_dir != Vector2.ZERO:
+	aim_dir = Input.get_vector("aim_left" + str(index), "aim_right" + str(index), "aim_up" + str(index), "aim_down" + str(index))
+	if aim_dir != Vector2.ZERO and !spell_blast_active:
 		$PlayerSpellPoint.rotation = aim_dir.angle()
+		#print(str(aim_dir))
 		#lerp_angle($PlayerSpellPoint.rotation, aim_dir.angle(), 0.5)
 
 
 func AnimationLoop():
-	pass
+	var move_dir = Vector2.ZERO
+	move_dir.x = int(Input.is_action_pressed("move_right" + str(index))) - int(Input.is_action_pressed("move_left" + str(index)))
+	move_dir.y = (int(Input.is_action_pressed("move_down" + str(index))) - int(Input.is_action_pressed("move_up" + str(index)))) / float(2)
+	if move_dir != Vector2.ZERO:
+		player_anim_mode = "run"
+	else:
+		player_anim_mode = "idle"
+	match move_dir:
+		Vector2(-1,0):
+			player_anim_dir = "left"
+		Vector2(1,0):
+			player_anim_dir = "right"
+		Vector2(0,.5):
+			player_anim_dir = "down"
+		Vector2(0,-.5):
+			player_anim_dir = "up"
+	animation = player_anim_mode + "_" + player_anim_dir
+	$PlayerSprite/AnimationPlayer.play(animation)
 
 func SpellAnimationLoop():
-	var aim_dir = Input.get_vector("aim_left" + str(index), "aim_right" + str(index), "aim_up" + str(index), "aim_down" + str(index))
+	if (player_state == PlayerState.DEAD):
+		aim_dir = Vector2.ZERO
+	else:
+		aim_dir = Input.get_vector("aim_left" + str(index), "aim_right" + str(index), "aim_up" + str(index), "aim_down" + str(index))
+	
 	var spell_animation = "inactive"
 	
 	if spell_blast_active:
 		spell_animation = "blast"
+		spell_anim_player.play(spell_animation)
+		await spell_anim_player.animation_finished
+		spell_blast_active = false
+		return
 	elif aim_dir != Vector2.ZERO && !spell_blast_active:
 		spell_animation = "cast"
-		
+	
 	spell_anim_player.play(spell_animation)
 
+func set_player_state(state):
+	player_state = state
+
+func _on_area_2d_area_entered(area):
+	if area.is_in_group("projectile"):
+		area.deflect(aim_dir)
+
+func take_damage(damage):
+	health -= damage
+	
+	if (health <= 0 && player_state != PlayerState.DEAD):
+		kill_player()
+
+func kill_player():
+	player_state = PlayerState.DEAD
+	$DeathSound.play()
+	$PlayerSprite/AnimationPlayer.play("death")
+	spell_anim_player.play("inactive")
+	$PlayerHitbox.disabled = true
+	GameManager.SetPlayerIsDead(self.index, true)
+	if $PlayerSprite/AnimationPlayer.is_playing():
+		await $PlayerSprite/AnimationPlayer.animation_finished
+	if $DeathSound.playing:
+		await $DeathSound.finished
+	queue_free()
+	#GameManager.player_array[GameManager.player_array.find(func(p): return p.index == self.index)].player_dead = true
+
+func reset_player():
+	player_state = PlayerState.IMMOBILIZED
+	$PlayerHitbox.disabled = false
+	GameManager.SetPlayerIsDead(self.index, false)
+	#GameManager.player_array[GameManager.player_array.find(func(p): return p.index == self.index)].player_dead = false

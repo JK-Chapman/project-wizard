@@ -1,13 +1,42 @@
-[gd_scene load_steps=2 format=3 uid="uid://bkfqordlhofmh"]
+[gd_scene format=3 uid="uid://bkfqordlhofmh"]
 
+[ext_resource type="Script" uid="uid://c8jj361dce03s" path="res://GameObjects/Enemies/TrackingMissile.gd" id="1_42ck3"]
 [ext_resource type="Texture2D" uid="uid://bd8y3url0aq58" path="res://Assets/Placeholder/missile.png" id="1_m8geq"]
+[ext_resource type="AudioStream" uid="uid://beacskh8ymnym" path="res://SoundEffects/missile_deflected.wav" id="3_msv5d"]
+[ext_resource type="AudioStream" uid="uid://b8h0ihcm1nv67" path="res://SoundEffects/explosion.wav" id="4_33iqh"]
 
-[node name="Missile" type="Area2D"]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ctiyg"]
+radius = 1.42814
+height = 17.5792
+
+[node name="Missile" type="Area2D" unique_id=1019729748 groups=["projectile"]]
+scale = Vector2(0.7, 0.7)
 collision_layer = 4
 collision_mask = 11
+script = ExtResource("1_42ck3")
 
-[node name="MissileSprite" type="Sprite2D" parent="."]
+[node name="MissileSprite" type="Sprite2D" parent="." unique_id=1436174773]
 texture_filter = 1
+position = Vector2(-0.571429, 0)
+scale = Vector2(0.767857, 1)
 texture = ExtResource("1_m8geq")
 
-[node name="MissileHitbox" type="CollisionShape2D" parent="."]
+[node name="MissileHitbox" type="CollisionShape2D" parent="." unique_id=699117045]
+position = Vector2(-2.63899, 0.434)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_ctiyg")
+
+[node name="TrackingTimer" type="Timer" parent="." unique_id=1126267446]
+wait_time = 0.5
+one_shot = true
+
+[node name="MissileDeflected" type="AudioStreamPlayer2D" parent="." unique_id=1535088532]
+stream = ExtResource("3_msv5d")
+volume_db = -9.0
+
+[node name="MissileExplode" type="AudioStreamPlayer2D" parent="." unique_id=585645132]
+stream = ExtResource("4_33iqh")
+volume_db = -3.576
+
+[connection signal="body_entered" from="." to="." method="_on_Missile_body_entered"]
+[connection signal="timeout" from="TrackingTimer" to="." method="_on_tracking_timer_timeout"]
