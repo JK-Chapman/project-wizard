@@ -118,8 +118,8 @@ tile_set = SubResource("TileSet_6krt5")
 
 [node name="ZoomCam" parent="." unique_id=1410093442 instance=ExtResource("2_mgde4")]
 position = Vector2(403, 235)
-min_zoom = 2.0
-max_zoom = 0.4
+min_zoom = 0.6
+max_zoom = 2.5
 
 [node name="TimerLabel" type="Label" parent="ZoomCam" unique_id=1368357341]
 texture_filter = 1

@@ -129,6 +129,11 @@ func kill_player():
 	spell_anim_player.play("inactive")
 	$PlayerHitbox.disabled = true
 	GameManager.SetPlayerIsDead(self.index, true)
+	if $PlayerSprite/AnimationPlayer.is_playing():
+		await $PlayerSprite/AnimationPlayer.animation_finished
+	if $DeathSound.playing:
+		await $DeathSound.finished
+	queue_free()
 	#GameManager.player_array[GameManager.player_array.find(func(p): return p.index == self.index)].player_dead = true
 
 func reset_player():

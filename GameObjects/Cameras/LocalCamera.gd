@@ -1,13 +1,12 @@
 extends Camera2D
 
-
 var targets = []
-var margin
 
-@export var move_speed:float = 30
-@export var zoom_speed:float = 3.0
-@export var min_zoom:float = 5.0
-@export var max_zoom:float = 0.5
+@export var move_speed: float = 30.0
+@export var zoom_speed: float = 3.0
+@export var min_zoom: float = 0.4   # most zoomed out (smaller = wider view)
+@export var max_zoom: float = 1.5   # most zoomed in
+@export var padding: float = 100.0  # world-space clearance around outermost players
 
 @onready var screen_size = DisplayServer.window_get_size()
 
@@ -24,29 +23,26 @@ func remove_target(t):
 
 func _process(delta):
 	screen_size = DisplayServer.window_get_size()
-	margin = Vector2(screen_size.x * .05, screen_size.y * .1)
-	
+
+	targets = targets.filter(func(t): return is_instance_valid(t))
+
 	if !targets:
 		return
-	
-	# Keep the camera centered among all targets
-	var p = Vector2.ZERO
+
+	# Center on the midpoint of all targets
+	var bounds = Rect2(targets[0].position, Vector2.ZERO)
 	for target in targets:
-		p += target.position
-	p /= targets.size()
-	position = lerp(position, p, move_speed * delta)
-	
-	# Find the zoom that will contain all targets
-	var r = Rect2(position, Vector2.ONE)
-	for target in targets:
-		r = r.expand(target.position)
-	r = r.grow_individual(margin.x, margin.y, margin.x, margin.y)
-	var z
-	if r.size.x > r.size.y * screen_size.aspect():
-		z = 1 / clamp(r.size.x / screen_size.x, max_zoom, min_zoom)
-	else:
-		z = 1 / clamp(r.size.y / screen_size.y, max_zoom, min_zoom)
-	zoom = lerp(zoom, Vector2.ONE * z, zoom_speed * delta)
-	
+		bounds = bounds.expand(target.position)
+
+	position = lerp(position, bounds.get_center(), move_speed * delta)
+
+	# Zoom to fit all targets with padding
+	bounds = bounds.grow(padding)
+	var target_zoom = clamp(
+		minf(screen_size.x / bounds.size.x, screen_size.y / bounds.size.y),
+		min_zoom, max_zoom
+	)
+	zoom = lerp(zoom, Vector2.ONE * target_zoom, zoom_speed * delta)
+
 	# For debug
-	#get_parent().draw_cam_rect(r)
+	#get_parent().draw_cam_rect(bounds)

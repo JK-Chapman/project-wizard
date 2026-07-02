@@ -102,7 +102,7 @@ tile_map_data = PackedByteArray("AAAAAP7/AAAFAAMAAAAAAAAAAAAAAAQAAAAAAAEAAAAAAAU
 tile_set = SubResource("TileSet_pof2s")
 
 [node name="ZoomCam" parent="." unique_id=1770658077 instance=ExtResource("3_ci4fa")]
-max_zoom = 0.3
+max_zoom = 2.5
 
 [node name="SpawnZone" type="Area2D" parent="." unique_id=1599697280]
 

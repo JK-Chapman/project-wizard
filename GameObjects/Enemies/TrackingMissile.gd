@@ -19,6 +19,7 @@ var deflect_dir
 var drag = 0.12
 var bouncing = false  # true while the missile should bounce off walls instead of explode
 var dead = false
+var has_target = false
 
 func init():
 	missile_stage = randi_range(0, 4);
@@ -33,9 +34,14 @@ func start(_position):
 func _physics_process(delta):
 	var direction = transform.x
 
-	if is_instance_valid(target):
+	if is_instance_valid(target) and target.player_state != Player.PlayerState.DEAD:
+		has_target = true
 		direction = global_position.direction_to(target.global_position)
-	elif $TrackingTimer.is_stopped(): # our target is gone, pick a new one
+	elif has_target:
+		# Target was removed from the scene — retarget immediately
+		has_target = false
+		set_random_target()
+	elif $TrackingTimer.is_stopped():
 		set_random_target()
 
 	var desired_velocity = direction * speed_stages[missile_stage]
@@ -88,6 +94,7 @@ func _on_Missile_body_entered(_body):
 
 func deflect(direction: Vector2):
 	target = null
+	has_target = false
 	$MissileDeflected.play()
 
 	var dir: Vector2 = direction.normalized()
@@ -126,7 +133,7 @@ func set_random_target():
 		target = null
 	else: # otherwise set a new target based on a random player index
 		target_vars = p_array_copy.pick_random()
-		target = get_parent().get_node("Player" + str(target_vars.index))
+		target = get_parent().get_node_or_null("Player" + str(target_vars.index))
 
 
 func _on_tracking_timer_timeout():
