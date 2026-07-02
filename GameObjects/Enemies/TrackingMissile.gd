@@ -17,7 +17,8 @@ var target = null
 var target_vars = null
 var deflect_dir
 var drag = 0.12
-
+var bouncing = false  # true while the missile should bounce off walls instead of explode
+var dead = false
 
 func init():
 	missile_stage = randi_range(0, 4);
@@ -31,48 +32,80 @@ func start(_position):
 
 func _physics_process(delta):
 	var direction = transform.x
-	
+
 	if is_instance_valid(target):
 		direction = global_position.direction_to(target.global_position)
 	elif $TrackingTimer.is_stopped(): # our target is gone, pick a new one
 		set_random_target()
-	
+
 	var desired_velocity = direction * speed_stages[missile_stage]
-	#var previous_velocity = velocity
 	var change = (desired_velocity - velocity) * drag
-	
+
 	velocity += change
-	
-	position += velocity * delta
+
+	_move_with_wall_check(delta)
+
+func _move_with_wall_check(delta):
+	if dead:
+		return
+	var movement = velocity * delta
+	if movement.length_squared() < 0.001:
+		global_position += movement
+		look_at(global_position + velocity)
+		return
+
+	var query = PhysicsRayQueryParameters2D.create(global_position, global_position + movement, 1)
+	var result = get_world_2d().direct_space_state.intersect_ray(query)
+
+	if result.is_empty():
+		global_position += movement
+	elif bouncing:
+		global_position = result.position + result.normal * 2.0
+		velocity = velocity.bounce(result.normal)
+		_on_wall_bounce()
+	else:
+		explode()
+		return
+
 	look_at(global_position + velocity)
-	
-	#acceleration += seek()
-	#velocity += acceleration * delta
-	#velocity = velocity.limit_length(speed_stages[missile_stage])
-	#rotation = velocity.angle()
-	#position += velocity * delta
+
+func _on_wall_bounce():
+	$MissileDeflected.play()
+	$TrackingTimer.start()
 
 func _on_Missile_body_entered(_body):
-	if (_body.is_in_group("player")):
+	if _body.is_in_group("player"):
 		_body.take_damage(missile_damage)
-		pass
-	explode()
+		explode()
+		return
+	if bouncing:
+		# Raycast missed this wall; approximate the normal from body position
+		var approx_normal = (global_position - _body.global_position).normalized()
+		velocity = velocity.bounce(approx_normal)
+		_on_wall_bounce()
+	else:
+		explode()
 
-func deflect(direction):
+func deflect(direction: Vector2):
 	target = null
-	
 	$MissileDeflected.play()
-	
-	rotation += randf_range(-15, 15)
-	velocity = velocity.abs() * direction.normalized()
-	acceleration = acceleration.abs() * direction.normalized()
-	
-	if (missile_stage < speed_stages.size()):
+
+	var dir: Vector2 = direction.normalized()
+	var speed: float = velocity.length()
+
+	velocity = dir * speed
+	acceleration = Vector2.ZERO
+	bouncing = true
+
+	if missile_stage < speed_stages.size() - 1:
 		missile_stage += 1
-	
+
 	$TrackingTimer.start()
 
 func explode():
+	if dead:
+		return
+	dead = true
 	$MissileExplode.play()
 	#$Particles2D.emitting = false
 	set_physics_process(false)
@@ -82,12 +115,12 @@ func explode():
 
 func set_random_target():
 	var p_array_copy = GameManager.player_array.duplicate(true).filter(func(p): return p.player_dead == false)
-	
+
 	# If target_vars is null, we just instantiated the object and need to set an initial target.
 	# This if statement excludes the current target if it exists.
 	if (target_vars != null and p_array_copy.size() > 1):
 		p_array_copy.erase(target_vars)
-	
+
 	# can't have a target if there are no possible targets! :D
 	if p_array_copy.size() == 0:
 		target = null
@@ -97,4 +130,5 @@ func set_random_target():
 
 
 func _on_tracking_timer_timeout():
+	bouncing = false
 	set_random_target()

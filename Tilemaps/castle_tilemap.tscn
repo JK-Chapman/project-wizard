@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://c5mb387h4suxp"]
+[gd_scene format=3 uid="uid://c5mb387h4suxp"]
 
 [ext_resource type="Texture2D" uid="uid://bx1doklwb1ltg" path="res://Tilemaps/ground.png" id="1_ec3xo"]
 
@@ -24,9 +24,11 @@ texture = ExtResource("1_ec3xo")
 1:2/0 = 0
 2:2/0 = 0
 3:2/0 = 0
+3:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(8, -8, -8, -8, -8, 8, 8, 8)
 4:2/0 = 0
 5:2/0 = 0
 6:2/0 = 0
+6:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, 8, -8, -8, 8, -8, 8, 8)
 7:2/0 = 0
 8:2/0 = 0
 9:2/0 = 0
@@ -51,6 +53,7 @@ texture = ExtResource("1_ec3xo")
 4:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 5:4/0 = 0
 6:4/0 = 0
+6:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(8, -8, -8, -8, -8, 8, 8, 8)
 7:4/0 = 0
 8:4/0 = 0
 9:4/0 = 0
@@ -81,7 +84,7 @@ physics_layer_0/collision_layer = 1
 physics_layer_0/collision_mask = 7
 sources/0 = SubResource("TileSetAtlasSource_sj4b6")
 
-[node name="GroundLayer" type="TileMapLayer"]
+[node name="GroundLayer" type="TileMapLayer" unique_id=1771466777]
 use_parent_material = true
 position = Vector2(1, 0)
 tile_set = SubResource("TileSet_pof2s")
