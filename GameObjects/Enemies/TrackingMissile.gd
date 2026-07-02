@@ -4,6 +4,10 @@ extends Area2D
 #@export var steer_force = 130.0
 @export var missile_stage = 0
 @export var missile_damage = 1
+# When retargeting, how much a player behind the missile is de-weighted vs one ahead of it.
+# 1.0 = ignore direction (pure proximity); lower = stronger pull toward players in the
+# direction the missile is heading. Proximity still dominates either way.
+@export var direction_bias_min := 0.35
 
 # missile stages
 var MAX_STAGE = 9
@@ -78,12 +82,14 @@ func _move_with_wall_check(delta):
 func _on_wall_bounce():
 	$MissileDeflected.play()
 	$TrackingTimer.start()
+	increaseMissileStage()
 
 func _on_Missile_body_entered(_body):
 	if _body.is_in_group("player"):
 		_body.take_damage(missile_damage)
 		explode()
 		return
+		
 	if bouncing:
 		# Raycast missed this wall; approximate the normal from body position
 		var approx_normal = (global_position - _body.global_position).normalized()
@@ -104,10 +110,12 @@ func deflect(direction: Vector2):
 	acceleration = Vector2.ZERO
 	bouncing = true
 
+	increaseMissileStage()
+	$TrackingTimer.start()
+
+func increaseMissileStage():
 	if missile_stage < speed_stages.size() - 1:
 		missile_stage += 1
-
-	$TrackingTimer.start()
 
 func explode():
 	if dead:
@@ -121,19 +129,46 @@ func explode():
 	queue_free()
 
 func set_random_target():
-	var p_array_copy = GameManager.player_array.duplicate(true).filter(func(p): return p.player_dead == false)
+	var candidates = GameManager.player_array.filter(func(p): return p.player_dead == false)
 
 	# If target_vars is null, we just instantiated the object and need to set an initial target.
-	# This if statement excludes the current target if it exists.
-	if (target_vars != null and p_array_copy.size() > 1):
-		p_array_copy.erase(target_vars)
+	# This if statement excludes the current target (the one that just deflected it) if it exists.
+	if (target_vars != null and candidates.size() > 1):
+		candidates.erase(target_vars)
 
-	# can't have a target if there are no possible targets! :D
-	if p_array_copy.size() == 0:
+	# Score each candidate by proximity (dominant) with a bias toward players in the direction
+	# the missile is currently heading, then pick weighted-randomly.
+	var heading = velocity.normalized()
+	var scored = []  # each entry: [player_vars, node, weight]
+	for pv in candidates:
+		var node = get_parent().get_node_or_null("Player" + str(pv.index))
+		if node == null:
+			continue
+		var to_player = node.global_position - global_position
+		var dist = max(to_player.length(), 1.0)
+		var weight = 1.0 / dist  # proximity dominates
+		if heading.length() > 0.01:
+			var align = heading.dot(to_player / dist)  # -1 behind .. 1 ahead
+			weight *= lerp(direction_bias_min, 1.0, (align + 1.0) / 2.0)
+		scored.append([pv, node, weight])
+
+	if scored.is_empty():
 		target = null
-	else: # otherwise set a new target based on a random player index
-		target_vars = p_array_copy.pick_random()
-		target = get_parent().get_node_or_null("Player" + str(target_vars.index))
+		return
+
+	var total = 0.0
+	for s in scored:
+		total += s[2]
+	var roll = randf() * total
+	for s in scored:
+		roll -= s[2]
+		if roll <= 0.0:
+			target_vars = s[0]
+			target = s[1]
+			return
+	# Fallback for float rounding
+	target_vars = scored[-1][0]
+	target = scored[-1][1]
 
 
 func _on_tracking_timer_timeout():
