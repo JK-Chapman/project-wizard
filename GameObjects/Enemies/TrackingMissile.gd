@@ -82,6 +82,7 @@ func _move_with_wall_check(delta):
 func _on_wall_bounce():
 	$MissileDeflected.play()
 	$TrackingTimer.start()
+	$BounceTimer.start()
 	increaseMissileStage()
 
 func _on_Missile_body_entered(_body):
@@ -112,6 +113,7 @@ func deflect(direction: Vector2):
 
 	increaseMissileStage()
 	$TrackingTimer.start()
+	$BounceTimer.start()
 
 func increaseMissileStage():
 	if missile_stage < speed_stages.size() - 1:
@@ -172,5 +174,7 @@ func set_random_target():
 
 
 func _on_tracking_timer_timeout():
-	bouncing = false
 	set_random_target()
+
+func _on_bounce_timer_timeout():
+	bouncing = false

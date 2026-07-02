@@ -369,7 +369,6 @@ position = Vector2(0, -1)
 shape = SubResource("CapsuleShape2D_fb4g0")
 
 [node name="PlayerSpellPoint" type="Node2D" parent="." unique_id=1525849958]
-position = Vector2(-1, 1)
 
 [node name="SpellPointSprite" type="Sprite2D" parent="PlayerSpellPoint" unique_id=547129202]
 visible = false
