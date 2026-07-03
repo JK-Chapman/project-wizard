@@ -30,8 +30,7 @@ shape = SubResource("CapsuleShape2D_ctiyg")
 wait_time = 0.5
 one_shot = true
 
-[node name="BounceTimer" type="Timer" parent="."]
-wait_time = 1.0
+[node name="BounceTimer" type="Timer" parent="." unique_id=1805193066]
 one_shot = true
 
 [node name="MissileDeflected" type="AudioStreamPlayer2D" parent="." unique_id=1535088532]

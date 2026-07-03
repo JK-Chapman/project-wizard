@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://ciipxxf2dnmvh" path="res://Assets/Placeholder/wizardblast.png" id="3_0egyb"]
 [ext_resource type="AudioStream" uid="uid://bx66r65xgjshv" path="res://SoundEffects/deflect.wav" id="4_qedkl"]
 [ext_resource type="AudioStream" uid="uid://cinvtl4xmh5yo" path="res://SoundEffects/player_dead.wav" id="5_y85w3"]
+[ext_resource type="Script" uid="uid://bqwrpind1cat0" path="res://GameObjects/Player/WarpIndicator.gd" id="6_wrpin"]
 
 [sub_resource type="Animation" id="Animation_sehtm"]
 length = 0.001
@@ -399,5 +400,13 @@ volume_db = -10.0
 
 [node name="DeathSound" type="AudioStreamPlayer2D" parent="." unique_id=932213901]
 stream = ExtResource("5_y85w3")
+
+[node name="WarpIndicator" type="Node2D" parent="." unique_id=910278744]
+texture_filter = 1
+position = Vector2(0, -16)
+script = ExtResource("6_wrpin")
+radius = 2.61
+width = 1.495
+ready_color = Color(0.9428228, 0.94282264, 0.94282264, 0.9490196)
 
 [connection signal="area_entered" from="PlayerSpellPoint/SpellPointSprite/Area2D" to="." method="_on_area_2d_area_entered"]

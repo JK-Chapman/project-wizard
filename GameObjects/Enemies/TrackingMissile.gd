@@ -8,6 +8,8 @@ extends Area2D
 # 1.0 = ignore direction (pure proximity); lower = stronger pull toward players in the
 # direction the missile is heading. Proximity still dominates either way.
 @export var direction_bias_min := 0.35
+# Speed multiplier applied to a missile the instant it's warp-launched; drag settles it back down.
+@export var warp_launch_boost := 1.0
 
 # missile stages
 var MAX_STAGE = 9
@@ -24,6 +26,7 @@ var drag = 0.12
 var bouncing = false  # true while the missile should bounce off walls instead of explode
 var dead = false
 var has_target = false
+var warp_frozen = false  # true while a player has an armed warp on this missile (held in place)
 
 func init():
 	missile_stage = randi_range(0, 4);
@@ -36,6 +39,11 @@ func start(_position):
 	set_random_target()
 
 func _physics_process(delta):
+	if warp_frozen:
+		# Held while a player's warp is armed. Velocity is preserved, so if the warp lapses
+		# the missile resumes exactly where it left off.
+		return
+
 	var direction = transform.x
 
 	if is_instance_valid(target) and target.player_state != Player.PlayerState.DEAD:
@@ -86,6 +94,10 @@ func _on_wall_bounce():
 	increaseMissileStage()
 
 func _on_Missile_body_entered(_body):
+	if warp_frozen:
+		# Suspended mid-warp — can't collide/explode until it's released or redirected.
+		return
+
 	if _body.is_in_group("player"):
 		_body.take_damage(missile_damage)
 		explode()
@@ -98,6 +110,29 @@ func _on_Missile_body_entered(_body):
 		_on_wall_bounce()
 	else:
 		explode()
+
+func freeze_for_warp():
+	# Player's warp just armed (stick hit neutral) — hold this missile in place during the wait.
+	warp_frozen = true
+
+func release_warp():
+	# Warp lapsed without a flick — let the missile carry on where it left off.
+	warp_frozen = false
+
+func warp_redirect(direction: Vector2, warp_position: Vector2):
+	# Warp completed: teleport to the spell point in the flicked direction and fire off that way
+	# with a speed burst (drag settles it back down). Plays the warp animation so it reads
+	# distinctly from a normal deflect, and resets tracking so it flies straight before re-homing.
+	warp_frozen = false
+	target = null
+	has_target = false
+	global_position = warp_position
+	velocity = direction.normalized() * speed_stages[missile_stage] * warp_launch_boost
+	$TrackingTimer.start()
+	if has_node("AnimationPlayer"):
+		$AnimationPlayer.play("warp")
+	$MissileDeflected.play()
+	look_at(global_position + velocity)
 
 func deflect(direction: Vector2):
 	target = null
