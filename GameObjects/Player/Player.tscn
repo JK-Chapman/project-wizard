@@ -271,6 +271,35 @@ tracks/2/keys = {
 "values": [3, 4, 5, 4, 3, 4]
 }
 
+[sub_resource type="Animation" id="Animation_warp"]
+resource_name = "warp"
+length = 0.3
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [3, 4, 5, 4]
+}
+
 [sub_resource type="Animation" id="Animation_w8yow"]
 resource_name = "cast"
 length = 0.25
@@ -345,6 +374,7 @@ tracks/1/keys = {
 _data = {
 &"RESET": SubResource("Animation_y8dan"),
 &"blast": SubResource("Animation_mo686"),
+&"warp": SubResource("Animation_warp"),
 &"cast": SubResource("Animation_w8yow"),
 &"inactive": SubResource("Animation_n247q")
 }
@@ -381,6 +411,7 @@ rotation = 1.5708
 scale = Vector2(1.02343, 0.953134)
 texture = ExtResource("3_0egyb")
 hframes = 6
+frame = 3
 
 [node name="Area2D" type="Area2D" parent="PlayerSpellPoint/SpellPointSprite" unique_id=302462585 groups=["deflect"]]
 position = Vector2(-0.333334, -1.66666)
@@ -388,6 +419,15 @@ collision_layer = 8
 collision_mask = 4
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="PlayerSpellPoint/SpellPointSprite/Area2D" unique_id=1269107565]
+polygon = PackedVector2Array(-7.16667, -5.83334, 7.83333, -5.83334, 7.83333, 2.5, 0.333334, 9.16666, -7.16667, 2.5)
+disabled = true
+
+[node name="WarpArea" type="Area2D" parent="PlayerSpellPoint/SpellPointSprite" groups=["warp"]]
+position = Vector2(-0.333334, -1.66666)
+collision_layer = 8
+collision_mask = 4
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="PlayerSpellPoint/SpellPointSprite/WarpArea"]
 polygon = PackedVector2Array(-7.16667, -5.83334, 7.83333, -5.83334, 7.83333, 2.5, 0.333334, 9.16666, -7.16667, 2.5)
 disabled = true
 

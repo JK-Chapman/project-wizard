@@ -52,7 +52,7 @@ position = Vector2(193, 115)
 player_index = 3
 
 [node name="SpawnPoint5" parent="SpawnPoints" unique_id=198544336 instance=ExtResource("3_yya3l")]
-position = Vector2(663, 343)
+position = Vector2(401, 285)
 player_index = 4
 
 [node name="StartTimer" type="Timer" parent="." unique_id=299203450]

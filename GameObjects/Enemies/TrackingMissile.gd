@@ -21,9 +21,10 @@ var velocity = Vector2.ZERO
 var acceleration = Vector2.ZERO
 var target = null
 var target_vars = null
+var last_warper_vars = null  # player who last warped us; excluded from the very next retarget too
 var deflect_dir
 var drag = 0.12
-var bouncing = false  # true while the missile should bounce off walls instead of explode
+var bouncing = true  # true while the missile should bounce off walls instead of explode
 var dead = false
 var has_target = false
 var warp_frozen = false  # true while a player has an armed warp on this missile (held in place)
@@ -88,6 +89,10 @@ func _move_with_wall_check(delta):
 	look_at(global_position + velocity)
 
 func _on_wall_bounce():
+	# Drop the current target so the missile holds its clean reflected angle (like a pool ball off a
+	# cushion) instead of instantly curving toward a player. It re-acquires when TrackingTimer lapses.
+	target = null
+	has_target = false
 	$MissileDeflected.play()
 	$TrackingTimer.start()
 	$BounceTimer.start()
@@ -104,12 +109,23 @@ func _on_Missile_body_entered(_body):
 		return
 		
 	if bouncing:
-		# Raycast missed this wall; approximate the normal from body position
-		var approx_normal = (global_position - _body.global_position).normalized()
-		velocity = velocity.bounce(approx_normal)
+		# The movement raycast missed this wall (already overlapping it); cast again to read the
+		# wall's real surface normal so the bounce angle matches the face it hit.
+		velocity = velocity.bounce(_wall_bounce_normal(_body))
 		_on_wall_bounce()
 	else:
 		explode()
+
+func _wall_bounce_normal(body: Node2D) -> Vector2:
+	# Ray along our travel direction to find the wall surface normal (accounts for angled tiles).
+	# Falls back to a body-centre approximation only if the ray somehow misses.
+	var dir = velocity.normalized()
+	if dir != Vector2.ZERO:
+		var query = PhysicsRayQueryParameters2D.create(global_position - dir * 16.0, global_position + dir * 16.0, 1)
+		var result = get_world_2d().direct_space_state.intersect_ray(query)
+		if not result.is_empty():
+			return result.normal
+	return (global_position - body.global_position).normalized()
 
 func freeze_for_warp():
 	# Player's warp just armed (stick hit neutral) — hold this missile in place during the wait.
@@ -119,13 +135,22 @@ func release_warp():
 	# Warp lapsed without a flick — let the missile carry on where it left off.
 	warp_frozen = false
 
-func warp_redirect(direction: Vector2, warp_position: Vector2):
+func carry_at(carry_position: Vector2, carry_direction: Vector2):
+	# Held on a player's spellpoint while they carry it: frozen, pinned to the given position
+	# and pointing outward like a fresh deflect. Driven each frame by the carrying player.
+	warp_frozen = true
+	global_position = carry_position
+	if carry_direction.length() > 0.001:
+		look_at(global_position + carry_direction)
+
+func warp_redirect(direction: Vector2, warp_position: Vector2, warper_vars = null):
 	# Warp completed: teleport to the spell point in the flicked direction and fire off that way
 	# with a speed burst (drag settles it back down). Plays the warp animation so it reads
 	# distinctly from a normal deflect, and resets tracking so it flies straight before re-homing.
 	warp_frozen = false
 	target = null
 	has_target = false
+	last_warper_vars = warper_vars
 	global_position = warp_position
 	velocity = direction.normalized() * speed_stages[missile_stage] * warp_launch_boost
 	$TrackingTimer.start()
@@ -135,6 +160,7 @@ func warp_redirect(direction: Vector2, warp_position: Vector2):
 	look_at(global_position + velocity)
 
 func deflect(direction: Vector2):
+	warp_frozen = false  # in case it was grabbed for a warp that resolved into a plain deflect
 	target = null
 	has_target = false
 	$MissileDeflected.play()
@@ -168,10 +194,17 @@ func explode():
 func set_random_target():
 	var candidates = GameManager.player_array.filter(func(p): return p.player_dead == false)
 
-	# If target_vars is null, we just instantiated the object and need to set an initial target.
-	# This if statement excludes the current target (the one that just deflected it) if it exists.
-	if (target_vars != null and candidates.size() > 1):
-		candidates.erase(target_vars)
+	# Never immediately re-target the player we were just chasing, nor the player who last warped
+	# us — unless excluding them would leave no valid candidates, in which case they're allowed back.
+	var excluded = []
+	if target_vars != null:
+		excluded.append(target_vars)
+	if last_warper_vars != null and last_warper_vars != target_vars:
+		excluded.append(last_warper_vars)
+	last_warper_vars = null
+	for ex in excluded:
+		if candidates.size() > 1:
+			candidates.erase(ex)
 
 	# Score each candidate by proximity (dominant) with a bias toward players in the direction
 	# the missile is currently heading, then pick weighted-randomly.
@@ -212,4 +245,4 @@ func _on_tracking_timer_timeout():
 	set_random_target()
 
 func _on_bounce_timer_timeout():
-	bouncing = false
+	bouncing = true

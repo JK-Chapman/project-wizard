@@ -5,15 +5,15 @@ class_name Player
 @onready var spell_anim_player = $PlayerSpellPoint/SpellPointSprite/SpellPointAnimPlayer
 var spell_blast_active = false
 
-# Warp (deflect -> neutral -> flick) vars
-@export var warp_neutral_threshold := 0.2  # aim magnitude at/below this counts as "stick at neutral"
-@export var warp_flick_threshold := 0.6    # aim magnitude at/above this (while armed) completes the warp
-@export var warp_arm_window := 0.2         # seconds allowed to reach neutral, then to flick, before the charge burns
-@export var warp_time_to_flick := 0.35     # seconds allowed to reach neutral, then to flick, before the charge burns
+# Warp (SPECIAL / left-trigger) vars
+@export var warp_window_time := 0.3        # how long the catch window stays open after activating (matches the anim)
+@export var warp_carry_time := 0.35        # how long a caught missile rides the spellpoint before auto-launching
 @export var warp_cooldown_time := 10.0     # seconds between warps
 var warp_state = WarpState.IDLE
-var warp_candidate = null                  # the just-deflected missile eligible to be warped
-var warp_timer = 0.0
+var warp_candidate = null                  # the missile currently caught on the spellpoint
+var warp_timer = 0.0                        # carry countdown while CARRYING
+var warp_window_timer = 0.0                 # catch-window countdown while ACTIVE
+var special_active = false                  # true while a warp is engaged (window open or carrying)
 var warp_on_cooldown = false
 var warp_cooldown_remaining = 0.0          # seconds left on the cooldown (drives the UI indicator)
 
@@ -24,11 +24,11 @@ enum PlayerState {
 	NORMAL
 }
 
-# Warp gesture phases: IDLE -> (deflect) WAIT_NEUTRAL -> (stick to neutral) ARMED -> (flick) warp
+# Warp phases: IDLE -> (SPECIAL pressed) ACTIVE catch window -> (missile caught) CARRYING -> launch
 enum WarpState {
 	IDLE,
-	WAIT_NEUTRAL,
-	ARMED
+	ACTIVE,
+	CARRYING
 }
 
 # Consts
@@ -63,7 +63,9 @@ func _process(_delta):
 		SpellAnimationLoop()
 
 func _unhandled_input(_event):
-	if !spell_blast_active and Input.is_action_just_pressed("blast" + str(index)) and aim_dir != Vector2.ZERO and player_state == PlayerState.NORMAL:
+	# Blast and SPECIAL are mutually exclusive — can't blast while a warp is engaged or the trigger is held.
+	if !spell_blast_active and not special_active and not Input.is_action_pressed("SPECIAL_" + str(index)) \
+			and Input.is_action_just_pressed("blast" + str(index)) and aim_dir != Vector2.ZERO and player_state == PlayerState.NORMAL:
 		spell_blast_active = true
 		$DeflectSound.play()
 
@@ -117,8 +119,14 @@ func SpellAnimationLoop():
 	else:
 		aim_dir = Input.get_vector("aim_left" + str(index), "aim_right" + str(index), "aim_up" + str(index), "aim_down" + str(index))
 	
+	# While a warp is engaged, hold the warp animation and don't let cast/inactive override it.
+	if special_active:
+		if spell_anim_player.has_animation("warp") and spell_anim_player.current_animation != "warp":
+			spell_anim_player.play("warp")
+		return
+
 	var spell_animation = "inactive"
-	
+
 	if spell_blast_active:
 		spell_animation = "blast"
 		spell_anim_player.play(spell_animation)
@@ -127,66 +135,92 @@ func SpellAnimationLoop():
 		return
 	elif aim_dir != Vector2.ZERO && !spell_blast_active:
 		spell_animation = "cast"
-	
+
 	spell_anim_player.play(spell_animation)
 
 func set_player_state(state):
 	player_state = state
 
 func _on_area_2d_area_entered(area):
-	if not area.is_in_group("projectile"):
-		return
-	# Always a normal deflect first.
-	area.deflect(aim_dir)
-	# Off cooldown, that deflect opens a warp opportunity on this missile: once the stick
-	# returns to neutral the warp arms, then a flick redirects the missile (see _warp_update).
-	if not warp_on_cooldown and warp_state == WarpState.IDLE:
-		warp_candidate = area
-		warp_state = WarpState.WAIT_NEUTRAL
-		warp_timer = warp_arm_window
+	# Blast deflect (right trigger) — unchanged and independent of the warp.
+	if area.is_in_group("projectile"):
+		area.deflect(aim_dir)
 
 func _warp_update(delta):
-	if warp_state == WarpState.IDLE:
-		return
-	# Missile is gone (exploded/freed) — nothing left to warp.
-	if not is_instance_valid(warp_candidate):
-		_reset_warp()
-		return
-
-	var aim_mag = aim_dir.length()
 	match warp_state:
-		WarpState.WAIT_NEUTRAL:
-			# Waiting for the player to let the stick return to neutral, which arms the warp
-			# and freezes the missile for the duration of the wait.
-			if aim_mag <= warp_neutral_threshold:
-				warp_state = WarpState.ARMED
-				warp_timer = warp_time_to_flick
-				#warp_candidate.freeze_for_warp()
-			else:
-				warp_timer -= delta
-				if warp_timer <= 0.0:
-					_reset_warp()  # never returned to neutral; opportunity lapses, charge kept
-		WarpState.ARMED:
-			# Armed: a flick to a new direction completes the warp; doing nothing burns the charge.
-			if aim_mag >= warp_flick_threshold:
-				var flick := aim_dir.normalized()
-				# Where the spell point would sit if the player were aiming the flicked direction.
-				$PlayerSpellPoint.rotation = flick.angle()
-				var warp_pos = $PlayerSpellPoint/SpellPointSprite/Area2D.global_position
-				warp_candidate.warp_redirect(flick, warp_pos)
-				_start_warp_cooldown()
-				_reset_warp()
-			else:
-				warp_timer -= delta
-				if warp_timer <= 0.0:
-					warp_candidate.release_warp()  # did nothing — unfreeze, charge is spent
-					_start_warp_cooldown()
-					_reset_warp()
+		WarpState.IDLE:
+			# Activate on a fresh SPECIAL press, if the charge is ready and we're not blasting
+			# (blast and SPECIAL are mutually exclusive — both committal).
+			if Input.is_action_just_pressed("SPECIAL_" + str(index)) and not warp_on_cooldown \
+					and not spell_blast_active and not Input.is_action_pressed("blast" + str(index)) \
+					and player_state == PlayerState.NORMAL:
+				_activate_warp()
+		WarpState.ACTIVE:
+			_update_warp_active(delta)
+		WarpState.CARRYING:
+			_update_warp_carrying(delta)
 
-func _reset_warp():
+func _activate_warp():
+	# Holding SPECIAL opens the catch window and spends the charge immediately (pressing at all
+	# always costs it). The warp animation is driven by special_active in SpellAnimationLoop.
+	warp_state = WarpState.ACTIVE
+	warp_window_timer = warp_window_time
+	special_active = true
+	_set_warp_area_enabled(true)
+	_start_warp_cooldown()
+
+func _update_warp_active(delta):
+	if aim_dir != Vector2.ZERO:
+		$PlayerSpellPoint.rotation = aim_dir.angle()
+	# Catch a missile sitting in the warp zone.
+	for a in $PlayerSpellPoint/SpellPointSprite/WarpArea.get_overlapping_areas():
+		if a.is_in_group("projectile") and not a.warp_frozen:
+			_grab_for_warp(a)
+			return
+	# Window closes on release or timeout — nothing caught, charge already spent.
+	warp_window_timer -= delta
+	if not Input.is_action_pressed("SPECIAL_" + str(index)) or warp_window_timer <= 0.0:
+		_end_warp()
+
+func _grab_for_warp(missile):
+	warp_candidate = missile
+	warp_state = WarpState.CARRYING
+	warp_timer = warp_carry_time
+	missile.freeze_for_warp()
+
+func _update_warp_carrying(delta):
+	# Missile is gone (exploded/freed) — nothing left to carry.
+	if not is_instance_valid(warp_candidate):
+		_end_warp()
+		return
+
+	# Steer the spellpoint and keep the missile pinned to it, pointing outward.
+	if aim_dir != Vector2.ZERO:
+		$PlayerSpellPoint.rotation = aim_dir.angle()
+	var carry_dir = $PlayerSpellPoint.global_transform.x.normalized()
+	var carry_pos = $PlayerSpellPoint/SpellPointSprite/WarpArea.global_position
+	warp_candidate.carry_at(carry_pos, carry_dir)
+
+	# Auto-launch when the carry time runs out, or instantly if the trigger is released.
+	warp_timer -= delta
+	if warp_timer <= 0.0 or not Input.is_action_pressed("SPECIAL_" + str(index)):
+		warp_candidate.warp_redirect(carry_dir, carry_pos, _get_own_player_vars())
+		_end_warp()
+
+func _get_own_player_vars():
+	var matches = GameManager.player_array.filter(func(p): return p.index == index)
+	return matches[0] if matches.size() > 0 else null
+
+func _end_warp():
 	warp_state = WarpState.IDLE
 	warp_candidate = null
 	warp_timer = 0.0
+	warp_window_timer = 0.0
+	special_active = false
+	_set_warp_area_enabled(false)
+
+func _set_warp_area_enabled(enabled):
+	$PlayerSpellPoint/SpellPointSprite/WarpArea/CollisionPolygon2D.disabled = not enabled
 
 func _start_warp_cooldown():
 	warp_on_cooldown = true
@@ -201,8 +235,8 @@ func _tick_warp_cooldown(delta):
 func take_damage(damage):
 	health -= damage
 	
-	if (health <= 0 && player_state != PlayerState.DEAD):
-		kill_player()
+	#if (health <= 0 && player_state != PlayerState.DEAD):
+		#kill_player()
 
 func kill_player():
 	player_state = PlayerState.DEAD
